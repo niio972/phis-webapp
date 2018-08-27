@@ -30,7 +30,8 @@
         "unclead/yii2-multiple-input": "~2.0",
         "miloschuman/yii2-highcharts-widget": "*",
         "openSILEX/guzzle-model-client": "dev-master",
-        "openSILEX/handsontable-php": "dev-master"
+        "openSILEX/handsontable-php": "dev-master",
+        "foxy/foxy":"^1.0.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
@@ -42,7 +43,11 @@
         "codeception/specify": "~0.4.3"
     },
     "config": {
-        "process-timeout": 1800
+        "process-timeout": 1800,
+        "foxy": {
+            "manager-options": "--modules-folder=./vendor/npm-asset",
+            "enabled": true
+         }
     },
     "scripts": {
         "post-create-project-cmd": [
@@ -61,10 +66,6 @@
             "generateCookieValidationKey": [
                 "config/web.php"
             ]
-        },
-        "asset-installer-paths": {
-            "npm-asset-library": "vendor/npm",
-            "bower-asset-library": "vendor/bower"
         }
     },    
     "repositories": [
