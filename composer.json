@@ -45,7 +45,7 @@
     "config": {
         "process-timeout": 1800,
         "foxy": {
-            "manager-options": "--modules-folder=./vendor/npm-asset",
+            "manager-options": "--modules-folder=vendor/npm-asset",
             "enabled": true
          }
     },
