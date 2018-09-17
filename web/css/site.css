@@ -14,12 +14,45 @@ table {
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
-    background: url(../images/background/wallpaper_leaf.jpg);
+    background-color: rgba(255, 255, 255, 0.6);
     background-position-x: right;
     background-position-y: center;
     background-repeat: no-repeat;
     background-attachment: fixed; 
+    background-size: cover;
 }
+
+.wrap-image {
+    min-height: 100%;
+    height: auto;
+    width: 100%;
+    position: absolute !important;
+    top:  0px;
+    left: 0px;
+    background: url(images/background/wallpaper_leaf.jpg);
+    background-position-x: right;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    background-size: cover;
+    z-index: -100 !important;
+}
+
+.container-bg{
+    
+
+}
+.owl-carousel.owl-drag .owl-item{
+   background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important; 
+}
+
+/*.owl-carousel .owl-item img{
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+}*/
 
 .wrap > .container {
     padding: 70px 15px 20px;

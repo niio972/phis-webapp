@@ -35,7 +35,10 @@ AppAsset::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
+ 
+
 <div class="wrap">
+    <div class="wrap-image"></div>   
     <?php
     //To use the fontawesome glyphicons on the page
     Icon::map($this, Icon::FA);
