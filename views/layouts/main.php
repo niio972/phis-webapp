@@ -35,10 +35,7 @@ AppAsset::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
- 
-
 <div class="wrap">
-    <div class="wrap-image"></div>   
     <?php
     //To use the fontawesome glyphicons on the page
     Icon::map($this, Icon::FA);
@@ -227,6 +224,17 @@ AppAsset::register($this);
     NavBar::end();
     ?>
 
+    <!--If you want to animate multiple background images 
+    in a slider, see site.css ".wrap" item and full-slider.css
+    for the source of the image You can add others images here
+    but you must modify full-slider.css consequently -->
+    <ul class="cb-slideshow">
+        <li><span>Image 01</span></li>
+        <li><span>Image 02</span></li>
+        <li><span>Image 03</span></li>
+        <li><span>Image 04</span></li>
+    </ul>
+    
     <div class="container">
         
         <div class="pull-right">
