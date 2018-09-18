@@ -1,3 +1,16 @@
+/******************************************************************************
+//                              full-slider.css
+// SILEX-PHIS
+// Copyright © INRA 2018
+// Creation date: 18 Sept, 2018
+// Contact: arnaud.charleroy@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
+//******************************************************************************
+Allows multiple background images animated
+/* 
+   SILEX:info
+   Set cb-slideshow properties
+   \SILEX:info
+*/
 .cb-slideshow,
 .cb-slideshow:after { 
     position: fixed;
@@ -7,10 +20,7 @@
     left: 0px;
     z-index: -999; 
 }
-.cb-slideshow:after { 
-    content: '';
-    background: transparent url(../images/pattern.png) repeat top left; 
-}
+
 .cb-slideshow li{
     list-style-type: none;
 }
@@ -49,12 +59,11 @@
     -ms-animation: titleAnimation 40s linear infinite 0s;
     animation: titleAnimation 40s linear infinite 0s; 
 }
-/*.cb-slideshow li div h3 { 
-    font-family: Arial, sans-serif;
-    font-size: 240px;
-    padding: 0;
-    line-height: 200px; 
-}*/
+/* 
+   SILEX:info
+   Set images url and these time of view
+   \SILEX:info
+*/
 .cb-slideshow li:nth-child(1) span { 
     background-image: url(../images/background/wallpaper_grapes_vine.jpg) 
 }
@@ -82,61 +91,14 @@
     -ms-animation-delay: 30s;
     animation-delay: 30s; 
 }
-/*SILEX:info
-If you want to add some text with the image
-\SILEX:info*/
-/*.cb-slideshow li:nth-child(5) span { 
-    background-image: url(images/background/wallpaper_green_house.jpg);
-    -webkit-animation-delay: 24s;
-    -moz-animation-delay: 24s;
-    -o-animation-delay: 24s;
-    -ms-animation-delay: 24s;
-    animation-delay: 24s; 
-}*/
-/*.cb-slideshow li:nth-child(6) span { 
-    background-image: url(../images/6.jpg);
-    -webkit-animation-delay: 30s;
-    -moz-animation-delay: 30s;
-    -o-animation-delay: 30s;
-    -ms-animation-delay: 30s;
-    animation-delay: 30s; 
-}*/
-/*.cb-slideshow li:nth-child(2) div { 
-    -webkit-animation-delay: 10s;
-    -moz-animation-delay: 10s;
-    -o-animation-delay: 10s;
-    -ms-animation-delay: 10s;
-    animation-delay: 10s; 
-}
-.cb-slideshow li:nth-child(3) div { 
-    -webkit-animation-delay: 20s;
-    -moz-animation-delay: 20s;
-    -o-animation-delay: 20s;
-    -ms-animation-delay: 20s;
-    animation-delay: 20s; 
-}
-.cb-slideshow li:nth-child(4) div { 
-    -webkit-animation-delay: 30s;
-    -moz-animation-delay: 30s;
-    -o-animation-delay: 30s;
-    -ms-animation-delay: 30s;
-    animation-delay: 30s; 
-}
-.cb-slideshow li:nth-child(5) div { 
-    -webkit-animation-delay: 24s;
-    -moz-animation-delay: 24s;
-    -o-animation-delay: 24s;
-    -ms-animation-delay: 24s;
-    animation-delay: 24s; 
-}
-.cb-slideshow li:nth-child(6) div { 
-    -webkit-animation-delay: 30s;
-    -moz-animation-delay: 30s;
-    -o-animation-delay: 30s;
-    -ms-animation-delay: 30s;
-    animation-delay: 30s; 
-}*/
-/* Animation for the slideshow images */
+
+/* 
+   SILEX:info
+   Animation for the slideshow images.
+   Define the level of opacity of the image
+   during the animation.
+   \SILEX:info
+*/
 @-webkit-keyframes imageAnimation { 
     0% { opacity: 0;
     -webkit-animation-timing-function: ease-in; }
@@ -182,50 +144,8 @@ If you want to add some text with the image
     25% { opacity: 1 }
     100% { opacity: 1 }
 }
-/* Animation for the title */
-/*@-webkit-keyframes titleAnimation { 
-    0% { opacity: 0 }
-    8% { opacity: 1 }
-    17% { opacity: 1 }
-    19% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-moz-keyframes titleAnimation { 
-    0% { opacity: 0 }
-    8% { opacity: 1 }
-    17% { opacity: 1 }
-    19% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-o-keyframes titleAnimation { 
-    0% { opacity: 0 }
-    8% { opacity: 1 }
-    17% { opacity: 1 }
-    19% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-ms-keyframes titleAnimation { 
-    0% { opacity: 0 }
-    8% { opacity: 1 }
-    17% { opacity: 1 }
-    19% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@keyframes titleAnimation { 
-    0% { opacity: 0 }
-    8% { opacity: 1 }
-    17% { opacity: 1 }
-    19% { opacity: 0 }
-    100% { opacity: 0 }
-}*/
+
 /* Show at least something when animations not supported */
 .no-cssanimations .cb-slideshow li span{
 	opacity: 1;
-}
-
-@media screen and (max-width: 1140px) { 
-    .cb-slideshow li div h3 { font-size: 140px }
-}
-@media screen and (max-width: 600px) { 
-    .cb-slideshow li div h3 { font-size: 80px }
 }

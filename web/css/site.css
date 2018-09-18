@@ -15,10 +15,14 @@ table {
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
-    /*  If you want only one image uncomment the line below
-    and comment the line background-color: rgba(255, 255, 255, 0.4);*/
-    /*background: url(../images/background/wallpaper_leaf.jpg);*/
-    background-color: rgba(255, 255, 255, 0.4);
+    /*
+    SILEX:info
+    If you want multiple background images comment the line below
+    and uncomment the line background-color: rgba(255, 255, 255, 0.4);
+    \SILEX:info
+    */
+    background: url(../images/background/wallpaper_leaf.jpg);
+    /*background-color: rgba(255, 255, 255, 0.4);*/
     background-position-x: right;
     background-position-y: center;
     background-repeat: no-repeat;

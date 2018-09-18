@@ -224,16 +224,22 @@ AppAsset::register($this);
     NavBar::end();
     ?>
 
-    <!--If you want to animate multiple background images 
-    in a slider, see site.css ".wrap" item and full-slider.css
-    for the source of the image You can add others images here
-    but you must modify full-slider.css consequently -->
-    <ul class="cb-slideshow">
+    <!--
+    SILEX:info
+    If you want to activate animated multiple background images 
+    feature uncomment these lines below and
+    see site.css ".wrap" to disable the current
+    background and full-slider.css to set source of the images.
+    You can add others images here  but you must modify full-slider.css 
+    consequently
+    \SILEX:info
+    -->
+<!--    <ul class="cb-slideshow">
         <li><span>Image 01</span></li>
         <li><span>Image 02</span></li>
         <li><span>Image 03</span></li>
         <li><span>Image 04</span></li>
-    </ul>
+    </ul>-->
     
     <div class="container">
         
