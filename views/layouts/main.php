@@ -83,7 +83,7 @@ AppAsset::register($this);
 //                            ]
                             //\SILEX:info
                         ]];
-        $menuItems[] = ['label' => Yii::t('app', 'Dataset'), 'url' => ['/dataset/create']];
+        $menuItems[] = ['label' => Yii::t('app', 'Dataset'), 'url' => ['/dataset/index']];
         $menuItems[] = ['label' => Yii::t('app', 'Installation'),
                         'items' => [
                             [

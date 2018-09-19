@@ -630,6 +630,30 @@ class DatasetController extends Controller {
     }
     
     /**
+     * index page
+     * @return mixed
+     */
+    public function actionIndex() {
+        $searchModel = new \app\models\yiiModels\DatasetSearch();
+        $searchResult = $searchModel->search(Yii::$app->session[\app\models\wsModels\WSConstants::ACCESS_TOKEN], Yii::$app->request->queryParams);
+
+        
+        if (is_string($searchResult)) {
+            return $this->render('/site/error', [
+                    'name' => Yii::t('app/messages','Internal error'),
+                    'message' => $searchResult]);
+        } else if (is_array($searchResult) && isset($searchResult[\app\models\wsModels\WSConstants::ACCESS_TOKEN])) { //user must log in
+            return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
+        } else {
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $searchResult,
+                'variables' => $this->getVariablesListLabelToShow()
+            ]);
+        }
+    }
+    
+    /**
      * register the dataset with the associated provenance
      * @return mixed
      */

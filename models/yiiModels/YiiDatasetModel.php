@@ -159,7 +159,8 @@ class YiiDatasetModel extends WSActiveRecord {
         }
         
         $provenance[YiiDatasetModel::URI] = $this->uriProvenance;
-        $provenance[YiiDatasetModel::CREATION_DATE] = $this->creationDate;
+        $creationDate = new \DateTime($this->creationDate);
+        $provenance[YiiDatasetModel::CREATION_DATE] = $creationDate->format(\DateTime::ATOM);
         $provenance[YiiDatasetModel::WAS_GENERATED_BY] = $wasGeneratedBy;  
         
         if ($this->documentsURIs !== null && $this->documentsURIs !== "") {
@@ -172,6 +173,7 @@ class YiiDatasetModel extends WSActiveRecord {
         $elementForWebService[YiiDatasetModel::PROVENANCE] = $provenance;
         
         $elementForWebService[YiiDatasetModel::DATA] = $this->data;
+        var_dump(json_encode($elementForWebService));exit;
         return $elementForWebService;
     }
 }
