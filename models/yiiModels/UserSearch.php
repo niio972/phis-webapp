@@ -84,6 +84,8 @@ class UserSearch extends YiiUserModel {
      */
     public function attributesToArray() {
         $elementForWebService = parent::attributesToArray();
+        
+        // add page attribute for WS paramaters
         if(isset($this->page)){
             $elementForWebService[WSConstants::PAGE] = $this->getPageForWS();
         }

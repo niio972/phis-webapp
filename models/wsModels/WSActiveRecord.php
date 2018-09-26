@@ -106,7 +106,7 @@ abstract class WSActiveRecord extends \yii\base\Model {
      */
     public function find($sessionToken, $attributes) {
         $requestRes = $this->wsModel->get($sessionToken, "", $attributes);
-//        var_dump($requestRes);exit;
+
         if (isset($requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION})) {
             $this->totalPages = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::TOTAL_PAGES};
             $this->totalCount = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::TOTAL_COUNT};
