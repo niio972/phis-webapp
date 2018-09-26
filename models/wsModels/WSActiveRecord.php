@@ -18,6 +18,8 @@ namespace app\models\wsModels;
  * @author Morgane Vidal <morgane.vidal@inra.fr>, Arnaud Charleroy <arnaud.charleroy@inra.fr>
  * @update [Arnaud Charleroy] 14 September, 2018 : Fix totalCount attribute when only 
  *                                                 one element is returned 
+ * @update [Arnaud Charleroy] 26 September, 2018 : Fix pageSize showed when only 
+ *                                                 one element is returned 
  */
 abstract class WSActiveRecord extends \yii\base\Model {
     
@@ -104,7 +106,7 @@ abstract class WSActiveRecord extends \yii\base\Model {
      */
     public function find($sessionToken, $attributes) {
         $requestRes = $this->wsModel->get($sessionToken, "", $attributes);
-
+//        var_dump($requestRes);exit;
         if (isset($requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION})) {
             $this->totalPages = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::TOTAL_PAGES};
             $this->totalCount = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::TOTAL_COUNT};
@@ -114,6 +116,8 @@ abstract class WSActiveRecord extends \yii\base\Model {
             //SILEX:info
             // A null pagination means only one result
             //\SILEX:info
+            $this->page = 0;
+            $this->pageSize = 1;
             $this->totalCount = 1;
         }
         
