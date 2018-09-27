@@ -25,21 +25,6 @@ use yii\filters\VerbFilter;
 class ImageController extends \yii\web\Controller {
     
     /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-    
-    /**
      * search images (by concerned element, rdf type) and return the result
      * @return the images corresponding to the search
      * @throws Exception

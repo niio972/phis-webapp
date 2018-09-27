@@ -11,7 +11,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\NotFoundHttpException;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use app\models\yiiModels\YiiUserModel;
@@ -26,22 +26,7 @@ use app\models\yiiModels\GroupSearch;
  * @author Arnaud Charleroy <arnaud.charleroy@inra.fr>
  * @update [Arnaud Charleroy] 23 August, 2018 : add annotations list linked to instance view and update coding style
  */
-class UserController extends Controller {
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-          'verbs' => [
-              'class' => VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST'],
-              ]
-          ]  
-        ];
-    }
+class UserController extends BaseController {
     
     /**
      * Search a user by email

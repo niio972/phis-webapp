@@ -9,7 +9,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use app\models\yiiModels\YiiAnnotationModel;
 use app\models\wsModels\WSUriModel;
 use app\models\yiiModels\YiiUserModel;
@@ -24,7 +24,7 @@ use app\controllers\UserController;
  * @update [Arnaud Charleroy] 23 august, 2018 : format with right coding style.
  * @link https://www.w3.org/TR/annotation-vocab
  */
-class AnnotationController extends Controller {
+class AnnotationController extends BaseController {
 
     /**
      * Php motivation instances session values name

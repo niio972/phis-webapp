@@ -15,7 +15,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use yii\web\UploadedFile;
@@ -34,28 +34,13 @@ require_once '../config/config.php';
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  * @update [Morgane Vidal] 10 August, 2018 : add link documents to sensors and vectors
  */
-class DocumentController extends Controller {
+class DocumentController extends BaseController {
     
     //The following constants are used to get some concepts URI from the Yii params.
     // (e.g. Yii::$app->params[DocumentController::PROJECT])
     const PROJECT = "Project";
     const EXPERIMENT = "Experiment";
     const INSTALLATION = "Installation";
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-          'verbs' => [
-              'class' => VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST'],
-              ]
-          ]  
-        ];
-    }
     
     /**
      * Generates a map uri => label

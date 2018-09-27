@@ -16,7 +16,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
 
@@ -34,7 +34,7 @@ require_once '../config/config.php';
  * @see app\models\yiiModels\YiiDatasetModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class DatasetController extends Controller {
+class DatasetController extends BaseController {
     
     //SILEX:TODO
     //create a global configuration file for the csv files

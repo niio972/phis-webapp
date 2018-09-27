@@ -16,7 +16,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\NotFoundHttpException;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use app\models\yiiModels\YiiProjectModel;
@@ -32,24 +32,9 @@ use app\models\wsModels\WSConstants;
  * @see app\models\yiiModels\YiiProjectModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class ProjectController extends Controller {
+class ProjectController extends BaseController {
     
     CONST ANNOTATIONS_DATA = "projectAnnotations";
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-          'verbs' => [
-              'class' => VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST'],
-              ]
-          ]  
-        ];
-    }
     
     /**
      * Get a Project's informations by it's uri

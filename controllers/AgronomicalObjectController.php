@@ -14,7 +14,7 @@
  namespace app\controllers;
  
  use Yii;
- use yii\web\Controller;
+ use app\controllers\BaseController;
  use yii\web\UploadedFile;
  use yii\filters\VerbFilter;
  
@@ -30,7 +30,7 @@ require_once '../config/config.php';
  * @see app\models\yiiModels\YiiAgronomicalObjectModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
- class AgronomicalObjectController extends Controller {
+ class AgronomicalObjectController extends BaseController {
      
      /**
       * the delim caracter for the csv files
@@ -73,20 +73,6 @@ require_once '../config/config.php';
       */
      const REPETITION = "Repetition";
           
-     /**
-     * define the behaviors
-     * @return array
-     */
-     public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
     
     /**
      * get the csv file header

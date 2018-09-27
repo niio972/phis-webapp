@@ -16,7 +16,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\NotFoundHttpException;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use app\models\yiiModels\YiiGroupModel;
@@ -28,22 +28,7 @@ use app\models\yiiModels\GroupSearch;
  * @see app\models\yiiModels\YiiGroupModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class GroupController extends Controller {
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-              'class' => VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST'],
-              ]
-          ]  
-        ];
-    }
+class GroupController extends BaseController {
     
     /**
      * Get Group informations by it's id

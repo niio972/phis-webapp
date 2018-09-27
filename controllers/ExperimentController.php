@@ -16,7 +16,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\NotFoundHttpException;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use app\models\yiiModels\YiiExperimentModel;
@@ -34,23 +34,8 @@ use app\models\wsModels\WSConstants;
  * @see app\models\yiiModels\YiiExperimentModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class ExperimentController extends Controller {
+class ExperimentController extends BaseController {
     CONST ANNOTATIONS_DATA = "experimentAnnotations";
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
     
     /**
      * Search an experiment by uri.

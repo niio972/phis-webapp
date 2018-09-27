@@ -15,7 +15,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 
 use app\models\yiiModels\YiiLayerModel;
 
@@ -25,22 +25,7 @@ use app\models\yiiModels\YiiLayerModel;
  * @see app\models\yiiModels\YiiLayerModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class LayerController extends Controller {
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-          'verbs' => [
-              'class' => \yii\filters\VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST']
-              ]
-          ]  
-        ];
-    }
+class LayerController extends BaseController {
     
     /**
      * Generate a layer

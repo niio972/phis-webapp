@@ -15,7 +15,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use app\models\yiiModels\YiiVectorModel;
@@ -31,24 +31,9 @@ use app\models\wsModels\WSConstants;
  * @update [Morgane Vidal] 10 August, 2018 : add link documents to vectors
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class VectorController extends Controller {
+class VectorController extends BaseController {
     
     CONST ANNOTATIONS_DATA = "vectorAnnotations";
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
     
     /**
      * get the vectors types

@@ -24,7 +24,7 @@ use app\models\yiiModels\YiiUnitModel;
 use app\models\yiiModels\YiiVariableModel;
 use Yii;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -33,23 +33,8 @@ use yii\web\NotFoundHttpException;
  * @see app\models\yiiModels\YiiVariableModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class VariableController extends Controller {
-    
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-    
+class VariableController extends BaseController {
+
     /**
      * Search a variable by uri
      * @param string $uri searched variable's uri

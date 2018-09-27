@@ -11,7 +11,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 
 use app\models\yiiModels\YiiInfrastructureModel;
@@ -24,24 +24,9 @@ use app\models\wsModels\WSConstants;
  * @see app\models\yiiModels\YiiInfrastructureModel
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
-class InfrastructureController extends Controller {
+class InfrastructureController extends BaseController {
     
      CONST ANNOTATIONS_DATA = "infrasctructureAnnotations";
-    
-    /**
-     * Define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
     
     /**
      * Render the view page of the infrascture corresponding to the given uri.

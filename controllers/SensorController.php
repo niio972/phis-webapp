@@ -10,7 +10,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
+use app\controllers\BaseController;
 use yii\filters\VerbFilter;
 use app\models\yiiModels\YiiSensorModel;
 use app\models\yiiModels\DocumentSearch;
@@ -26,7 +26,7 @@ use app\models\wsModels\WSConstants;
  * @update [Morgane Vidal] 13 March, 2018 : add link documents to sensors
  * @update [Arnaud Charleroy] 23 August, 2018 : add annotations list linked to an instance viewed and update coding style
  */
-class SensorController extends Controller {
+class SensorController extends BaseController {
     
     const APERTURE = "aperture";
     const FOCAL_LENGTH = "focalLength";
@@ -38,20 +38,6 @@ class SensorController extends Controller {
     const URI = "uri";
     
     CONST ANNOTATIONS_DATA = "sensorAnnotations";
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
     
     /**
      * get the sensors types (complete uri)
