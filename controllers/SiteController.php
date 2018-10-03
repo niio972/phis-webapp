@@ -8,7 +8,7 @@ use app\models\yiiModels\ContactForm;
 use app\models\yiiModels\YiiUserModel;
 
 class SiteController extends BaseController {
- 
+
     /**
     * @inheritdoc
     */
