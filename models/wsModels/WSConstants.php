@@ -28,4 +28,5 @@ class WSConstants {
     const TOKEN = 'token';
     const RESULT = 'result';
     const DATA_FILES = 'datafiles';
+    const FAILED_TO_CONNECT = 'Failed to connect to the web service';
 }

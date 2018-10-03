@@ -43,16 +43,22 @@ class BaseController extends Controller {
                     [
                         'allow' => true,
                         'matchCallback' => function ($rule, $action) {
+                            $result = true;
                             // if session not set, the user is disconnected
                             if (isset(Yii::$app->session['access_token']) && isset(Yii::$app->session['email'])) {
                                 $userModel = new YiiUserModel();
                                 $findByEmail = $userModel->findByEmail(Yii::$app->session[WSConstants::ACCESS_TOKEN], Yii::$app->session['email']);
-                                // if the session is not found in the WS, the user is disconnected
-                                if (!isset($findByEmail[WSConstants::TOKEN])) {
-                                    return true;
+                                if($findByEmail === WSConstants::FAILED_TO_CONNECT) {
+                                    $result = false;
                                 }
+                                // if the session is not found in the WS, the user is disconnected
+                                if ($result && isset($findByEmail[WSConstants::TOKEN])){
+                                     $result = false;
+                                }
+                            }else{
+                                throw new \yii\base\UserException(WSConstants::FAILED_TO_CONNECT);
                             }
-                            return false;
+                            return $result;
                         }
                     ],
                 ],

@@ -18,8 +18,6 @@ namespace app\controllers;
 use Yii;
 use app\controllers\BaseController;
 use yii\web\UploadedFile;
-use yii\filters\VerbFilter;
-
 use Exception;
 use app\models\yiiModels\YiiDocumentModel;
 use app\models\yiiModels\VariableSearch;
@@ -367,7 +365,7 @@ class DatasetController extends BaseController {
         $searchVariableModel = new VariableSearch();
         $variables = $searchVariableModel->find(Yii::$app->session['access_token'], []);
         
-        if ($variables !== null) {
+        if (!is_string($variables) && $variables !== null) {
             return \yii\helpers\ArrayHelper::map($variables, 'label', 'label');
         } else {
             return null;
