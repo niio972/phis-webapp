@@ -14,7 +14,6 @@
 
 namespace app\controllers;
 use Yii;
-use yii\filters\VerbFilter;
 
 /**
  * CRUD actions for YiiImageModel

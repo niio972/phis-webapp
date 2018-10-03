@@ -16,8 +16,6 @@
  use Yii;
  use app\controllers\BaseController;
  use yii\web\UploadedFile;
- use yii\filters\VerbFilter;
- 
  use app\models\yiiModels\YiiAgronomicalObjectModel;
  use app\models\yiiModels\AgronomicalObjectSearch;
  use app\models\yiiModels\YiiExperimentModel;

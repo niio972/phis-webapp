@@ -12,8 +12,6 @@ namespace app\controllers;
 
 use Yii;
 use app\controllers\BaseController;
-use yii\filters\VerbFilter;
-
 use app\models\yiiModels\YiiInfrastructureModel;
 use app\models\yiiModels\AnnotationSearch;
 use app\models\wsModels\WSConstants;

@@ -16,8 +16,6 @@ namespace app\controllers;
 
 use Yii;
 use app\controllers\BaseController;
-use yii\filters\VerbFilter;
-
 use yii\web\UploadedFile;
 
 use app\models\yiiModels\YiiDocumentModel;

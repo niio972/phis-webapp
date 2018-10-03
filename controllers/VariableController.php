@@ -13,7 +13,7 @@
 //***********************************************************************************************
 
 namespace app\controllers;
-
+use app\controllers\BaseController;
 use app\models\yiiModels\VariableSearch;
 use app\models\yiiModels\MethodSearch;
 use app\models\yiiModels\TraitSearch;
@@ -23,8 +23,6 @@ use app\models\yiiModels\YiiTraitModel;
 use app\models\yiiModels\YiiUnitModel;
 use app\models\yiiModels\YiiVariableModel;
 use Yii;
-use yii\filters\VerbFilter;
-use app\controllers\BaseController;
 use yii\web\NotFoundHttpException;
 
 /**

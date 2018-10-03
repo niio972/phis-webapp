@@ -11,7 +11,6 @@ namespace app\controllers;
 
 use Yii;
 use app\controllers\BaseController;
-use yii\filters\VerbFilter;
 use app\models\yiiModels\YiiSensorModel;
 use app\models\yiiModels\DocumentSearch;
 use app\models\yiiModels\AnnotationSearch;

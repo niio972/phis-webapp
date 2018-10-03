@@ -51,22 +51,6 @@ class DatasetController extends BaseController {
     const ERRORS_COLUMN = "Column";
     const ERRORS_MESSAGE = "Message";
 
-
-    /**
-     * define the behaviors
-     * @return array
-     */
-    public function behaviors() {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-    
     /**
      * transform a csv in JSON
      * @param array $csvContent the csv content to transform in json

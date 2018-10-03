@@ -11,7 +11,6 @@ namespace app\controllers;
 
 use Yii;
 use app\controllers\BaseController;
-use yii\filters\VerbFilter;
 use yii\base\ErrorException;
 use app\models\yiiModels\YiiDocumentModel;
 use app\models\wsModels\WSConstants;

@@ -16,8 +16,6 @@ namespace app\controllers;
 
 use Yii;
 use app\controllers\BaseController;
-use yii\filters\VerbFilter;
-
 use app\models\yiiModels\YiiVectorModel;
 use app\models\yiiModels\UserSearch;
 use app\models\yiiModels\DocumentSearch;

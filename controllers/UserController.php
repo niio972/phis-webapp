@@ -12,8 +12,6 @@ namespace app\controllers;
 use Yii;
 use yii\web\NotFoundHttpException;
 use app\controllers\BaseController;
-use yii\filters\VerbFilter;
-
 use app\models\yiiModels\YiiUserModel;
 use app\models\yiiModels\UserSearch;
 use app\models\yiiModels\GroupSearch;
