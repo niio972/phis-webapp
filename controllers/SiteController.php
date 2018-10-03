@@ -3,16 +3,28 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
-
+use app\controllers\BaseController;
 use app\models\yiiModels\ContactForm;
 use app\models\yiiModels\YiiUserModel;
 
-class SiteController extends Controller {
+class SiteController extends BaseController {
  
-
+    /**
+    * @inheritdoc
+    */
+    public function behaviors() {
+        $behaviours = parent::behaviors();
+        // add special behaviours for siteController
+        $siteRules = [
+                        'actions' => ['logout'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ];
+        $behaviours['access']['rules'][]= $siteRules;
+        $behaviours['access']['only'] = ['logout'];
+        return $behaviours;
+    }
+    
     /**
      * @inheritdoc
      */
