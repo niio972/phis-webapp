@@ -1,5 +1,4 @@
 <?php
-
 //******************************************************************************
 //                                       BaseController.php
 // SILEX-PHIS
@@ -18,8 +17,8 @@ use yii\filters\AccessControl;
 use app\models\wsModels\WSConstants;
 
 /**
- * Regroup common method used by controllers
- * Base behaviors for client web app access right
+ * Regroup common methods used by controllers
+ * Base behaviors for web app access right checking
  * @see yii\web\Controller
  * @author Arnaud Charleroy <arnaud.charleroy@inra.fr>
  */
