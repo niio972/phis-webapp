@@ -24,7 +24,7 @@ use app\models\wsModels\WSConstants;
  * @author Arnaud Charleroy <arnaud.charleroy@inra.fr>
  */
 class BaseController extends Controller {
-   
+
     /**
      * Define the behaviors
      * @return array
@@ -44,25 +44,41 @@ class BaseController extends Controller {
                         'allow' => true,
                         'matchCallback' => function ($rule, $action) {
                             $result = true;
-                            // if session not set, the user is disconnected
+                            $userModel = new YiiUserModel();
+                            
+                            // If the session is set, the user is connected 
+                            // Verify the WS token
                             if (isset(Yii::$app->session['access_token']) && isset(Yii::$app->session['email'])) {
-                                $userModel = new YiiUserModel();
                                 $findByEmail = $userModel->findByEmail(Yii::$app->session[WSConstants::ACCESS_TOKEN], Yii::$app->session['email']);
-                                if($findByEmail === WSConstants::FAILED_TO_CONNECT) {
+                                // If the session is not found in the WS, the user is disconnected
+                                if ($findByEmail === WSConstants::FAILED_TO_CONNECT) {
+                                    throw new \yii\base\UserException(WSConstants::FAILED_TO_CONNECT);
+                                }
+                                // If the session is not found in the WS, the user is disconnected
+                                if ($result && isset($findByEmail[WSConstants::TOKEN])) {
                                     $result = false;
                                 }
-                                // if the session is not found in the WS, the user is disconnected
-                                if ($result && isset($findByEmail[WSConstants::TOKEN])){
-                                     $result = false;
+                             // If session not set, the user is disconnected
+                            } else {
+                                // Test if web service is available
+                                $find = null;
+                                try {
+                                    $find = $userModel->find('tokentest', []);
+                                } catch (\GuzzleHttp\Exception\ServerException $exc) {
+                                    // The webservice works
+                                    $result = true;
                                 }
-                            }else{
-                                throw new \yii\base\UserException(WSConstants::FAILED_TO_CONNECT);
+                                // Test if web service is available
+                                if (isset($find) && $find === WSConstants::FAILED_TO_CONNECT) {
+                                    throw new \yii\base\UserException(WSConstants::FAILED_TO_CONNECT);
+                                }
                             }
                             return $result;
                         }
-                    ],
-                ],
-            ],
+                    ]
+                ]
+            ]
         ];
     }
+
 }
