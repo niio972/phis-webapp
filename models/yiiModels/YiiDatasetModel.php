@@ -25,8 +25,8 @@ use app\models\wsModels\WSDatasetModel;
 class YiiDatasetModel extends WSActiveRecord {
 
     /**
-     * Provenance uri
-     * @var string 
+     * Uri de la provenance
+     * @var type 
      */
     public $provenanceUri;
     
@@ -73,24 +73,6 @@ class YiiDatasetModel extends WSActiveRecord {
      * @var file
      */
     public $file;
-    
-    /**
-     * Sensor uris
-     * @var array 
-     */
-    public $provenanceSensingDevices;
-    
-    /**
-     * Agent uris
-     * @var array 
-     */
-    public $provenanceAgents;
-    
-    /**
-     * Experiment uri
-     * @var string 
-     */
-    public $experiment;
 
     const PROVENANCE = "provenance";
     const DATA = "data";
@@ -112,10 +94,8 @@ class YiiDatasetModel extends WSActiveRecord {
      */
     public function rules() {
         return [
-            [['provenanceAlias', 'file', 'provenanceUri','experiment'], 'required'],
-            [['variables','provenanceSensingDevices','provenanceAgents'], 'safe'],
+            [['variables', 'provenanceAlias', 'file', 'provenanceUri'], 'required'],
             [['provenanceComment'], 'string'],
-            [['experiment'], 'string'],
             [['provenanceUri', 'provenanceComment', 'documentsURIs', 'data', 'file'], 'safe'],
             [['file'], 'file', 'extensions' => 'csv']
         ];
@@ -127,14 +107,11 @@ class YiiDatasetModel extends WSActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'provenanceUri' => Yii::t('app', 'Provenance label'),
+            'provenanceUri' => Yii::t('app', 'Provenance (URI)'),
             'provenanceComment' => Yii::t('app', 'Provenance comment'),
-            'provenanceSensingDevices' => Yii::t('app', 'Sensor'),
-            'provenanceAgents' => Yii::t('app', 'Operator'),
-            'variables' => Yii::t('app', 'Experiment associated variable(s)'),
+            'variables' => Yii::t('app', 'Variable(s)'),
             'file' => Yii::t('app', 'Data file'),
-            'documentsUris' => Yii::t('app', 'Documents'),
-            'experiment' => Yii::t('app', 'Experiment')
+            'documentsUris' => Yii::t('app', 'Documents')
         ];
     }
 
