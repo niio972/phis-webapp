@@ -19,16 +19,14 @@ use Yii;
 use yii\web\Controller;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
+use Exception;
 use app\models\yiiModels\YiiDocumentModel;
 use app\models\wsModels\WSProvenanceModel;
+use app\models\yiiModels\VariableSearch;
 use app\models\wsModels\WSDataModel;
 use app\models\yiiModels\YiiConcernedItemModel;
 use openSILEX\handsontablePHP\adapter\HandsontableSimple;
 use openSILEX\handsontablePHP\classes\ColumnConfig;
-use app\models\wsModels\WSConstants;
-use app\components\helpers\Vocabulary;
-use app\models\yiiModels\YiiExperimentModel;
-use app\models\yiiModels\YiiSensorModel;
 
 require_once '../config/config.php';
 
@@ -44,7 +42,7 @@ class DatasetController extends Controller {
     //create a global configuration file for the csv files
     //\SILEX:TODO
 
-    const AGRONOMICAL_OBJECT_URI = "ScientificObjectAlias";
+    const AGRONOMICAL_OBJECT_URI = "ScientificObjectURI";
     const DATE = "Date";
     const VALUE = "Value";
     const ERRORS_MISSING_COLUMN = "Missing Columns";
@@ -52,13 +50,7 @@ class DatasetController extends Controller {
     const ERRORS_LINE = "Line";
     const ERRORS_COLUMN = "Column";
     const ERRORS_MESSAGE = "Message";
-    
-    const SENSORS_DATA = "sensors";
-    const SENSOR_DATA_URI = "sensorUri";
-    const SENSOR_DATA_LABEL = "sensorLabel";
-    const SENSOR_DATA_TYPE = "sensorType";
 
-    const PROVENANCE_PARAMS_VALUES = "provenanceNamespaces";
     /**
      * define the behaviors
      * @return array
@@ -143,113 +135,7 @@ class DatasetController extends Controller {
         fputcsv($file, $fileColumns, $delimiter = Yii::$app->params['csvSeparator']);
         fclose($file);
     }
-    
-     /**
-     * generate the csv file for the sensor dataset creation action. The csv file is
-     * generated with a column for each variable
-     * @param array variables list of the variables to add to the 
-     *                                file uri => alias
-     * @return mixed
-     */
-    public function actionGenerateAndDownloadDataSensorCreationFile() {
-        $fileColumns[] = DatasetController::DATE;
-        $variables = Yii::$app->request->post('variables');
-        foreach ($variables as $variableAlias) {
-            $fileColumns[] = $variableAlias;
-        }
-       
-        $csvPath = "coma";
-        if (Yii::$app->params['csvSeparator'] == ";") {
-            $csvPath = "semicolon";
-        }
-        
-        $file = fopen('./documents/DatasetFiles/' . $csvPath . '/datasetSensorTemplate.csv', 'w');
-        fputcsv($file, $fileColumns, $delimiter = Yii::$app->params['csvSeparator']);
-        fclose($file);
-    }
 
-    /**
-     * 
-     * @param type $experimentUri
-     */
-    public function actionGetExperimentMesuredVariablesSelectList($experimentUri){
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $variables = [];
-        $variables["data"] = [];
-        $experimentVariable = $this->getExperimentMesuredVariablesSelectList($experimentUri);
-        foreach ($experimentVariable as $key => $value) {
-            $variables["data"][] = ["id" => $key, "text" => $value];
-        }
-       
-        return($variables);
-    }
-    
-    private function getExperimentMesuredVariablesSelectList($experimentUri) {
-        if(!isset($experimentUri) || empty($experimentUri)){
-            return [];
-        }
-        $experimentModel = new YiiExperimentModel();
-        $variables = $experimentModel->getMeasuredVariables(
-                Yii::$app->session[WSConstants::ACCESS_TOKEN],
-                $experimentUri
-                );
-        if(isset($variables) && is_array($variables)){
-            return $variables;
-        }
-        return [];
-    }
-    
-    
-    /**
-     * variables associated to a given sensor with select2 dropdwon format
-     * @param type $sensorUri uri of the sensor
-     * @return array 
-     *  @example {
-     *      [
-     *          id =>"http://www.opensilex.org/demo/variables/id/v001", "text" => "labelv1",
-     *          
-     *      ],
-     *      [
-     *          id => "http://www.opensilex.org/demo/variables/id/v002", "text" => "labelv2",
-     *      ],
-     *  .....
-     * }
-     */
-    public function actionGetSensorMesuredVariablesSelectList($sensorUri){
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $variables = [];
-        $variables["data"] = [];
-        $experimentVariable = $this->getSensorMesuredVariablesSelectList($sensorUri);
-        foreach ($experimentVariable as $key => $value) {
-            $variables["data"][] = ["id" => $key, "text" => $value];
-        }
-       
-        return($variables);
-    }
-    
-    /**
-     * variables associated to a given sensor
-     * @param type $sensorUri
-     * @return type
-     *  @example [
-     *      "http://www.opensilex.org/demo/variables/id/v001" => "labelv1",
-     *      "http://www.opensilex.org/demo/variables/id/v002" => "labelv2",
-     * ]
-     */
-    private function getSensorMesuredVariablesSelectList($sensorUri) {
-        if(!isset($sensorUri) || empty($sensorUri)){
-            return [];
-        }
-        $experimentModel = new YiiSensorModel();
-        $variables = $experimentModel->getMeasuredVariables(
-                Yii::$app->session[WSConstants::ACCESS_TOKEN],
-                $sensorUri
-                );
-        if(isset($variables) && is_array($variables)){
-            return $variables;
-        }
-        return [];
-    }
     /**
      * 
      * @param array $csvErrors the errors founded. 
@@ -425,23 +311,17 @@ class DatasetController extends Controller {
         $datasetModel = new \app\models\yiiModels\YiiDatasetModel();
         $variablesModel = new \app\models\yiiModels\YiiVariableModel();
 
-        $token = Yii::$app->session[WSConstants::ACCESS_TOKEN];
+        $token = Yii::$app->session['access_token'];
+
+        // Load existing variables
+        $variables = $variablesModel->getInstancesDefinitionsUrisAndLabel($token);
+        $this->view->params["variables"] = $this->getVariablesListLabelToShowFromVariableList($variables);
 
         // Load existing provenances
         $provenanceService = new WSProvenanceModel();
         $provenances = $this->mapProvenancesByUri($provenanceService->getAllProvenances($token));
         $this->view->params["provenances"] = $provenances;
 
-         // Load existing agents
-        $userModel = new \app\models\yiiModels\YiiUserModel();
-        $users = $userModel->getPersonsURIAndName($token);
-        $this->view->params['agents'] = $users;
-        
-        // Load experiments
-        $experimentModel = new YiiExperimentModel();
-        $experiments =  $experimentModel->getExperimentsURIAndLabelList($token);
-        $this->view->params['experiments'] = $experiments;
-        
         //If the form is complete, register data
         if ($datasetModel->load(Yii::$app->request->post())) {
             //Store uploaded CSV file
@@ -455,19 +335,16 @@ class DatasetController extends Controller {
             unlink($serverFilePath);
 
             //Loaded given variables
-            $experimentVariables = $this->getExperimentMesuredVariablesSelectList($datasetModel->experiment) ;
-            $csvVariables = array_slice($csvHeaders, 2);
-            // select all variables that don"t exist in experiment variables
-            $variablesNotInExperiment = array_diff($csvVariables, array_values($experimentVariables)); 
+            $givenVariables = $datasetModel->variables;
+
             // Check CSV header with variables
-            if (count($variablesNotInExperiment) === 0) {
+            if (array_slice($csvHeaders, 2) === $givenVariables) {
+
                 // Get selected or create Provenance URI
                 if (!array_key_exists($datasetModel->provenanceUri, $provenances)) {
                     $provenanceUri = $this->createProvenance(
                             $datasetModel->provenanceUri,
-                            $datasetModel->provenanceComment,
-                            $datasetModel->provenanceSensingDevices,
-                            $datasetModel->provenanceAgents
+                            $datasetModel->provenanceComment
                     );
                     $datasetModel->provenanceUri = $provenanceUri;
                     $provenances = $this->mapProvenancesByUri($provenanceService->getAllProvenances($token));
@@ -486,53 +363,27 @@ class DatasetController extends Controller {
                                 $datasetModel->documentsURIs["documentURI"]
                         );
                     }
-                    // Load all objectsl inked to an experiment
-                    
-                    $SciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
-                    $SciencitificObjectSearch->experiment = $datasetModel->experiment;
-                    $SciencitificObjectSearch->pageSize = 30000;
-                    $result = $SciencitificObjectSearch->search($token);
 
-                    $objectUris = [];
-                    foreach ($result->getModels() as $object){
-                        $objectUris[$object->uri]=$object->label;
-                    }
                     $datasetModel->documentsURIs = null;
 
                     if ($linkDocuments === true) {
-                        $objectsErrors = [];
                         // Save CSV data linked to provenance URI
                         $values = [];
                         foreach ($fileContent as $rowStr) {
                             $row = str_getcsv($rowStr, Yii::$app->params['csvSeparator']);
-                            $scientifObjectAlias = $row[0];
-                            if(!array_search($scientifObjectAlias, $objectUris)){
-                                $objectsErrors[] = $scientifObjectAlias .  Yii::t("app/messages", " Object does not exists in this experiment");
-                                $scientifObjectUri = null;
-                            }else{
-                                $scientifObjectUri = array_search($scientifObjectAlias, $objectUris);
-                            }
+                            $scientifObjectUri = $row[0];
                             $date = $row[1];
                             for ($i = 2; $i < count($row); $i++) {
                                 $values[] = [
                                     "provenanceUri" => $provenanceUri,
                                     "objectUri" => $scientifObjectUri,
-                                    "variableUri" => array_search($csvVariables[$i - 2], $experimentVariables),
+                                    "variableUri" => array_search($givenVariables[$i - 2], $variables),
                                     "date" => $date,
                                     "value" => $row[$i]
                                 ];
                             }
                         }
-                        
-                        if(!empty($objectsErrors)){
-                            return $this->render('create', [
-                                'model' => $datasetModel,
-                                'errors' => $objectsErrors
-                                    ]
-                            );
-                        }
-                       
-                        
+
                         $dataService = new WSDataModel();
                         $result = $dataService->post($token, "/", $values);
 
@@ -571,7 +422,7 @@ class DatasetController extends Controller {
                 return $this->render('create', [
                             'model' => $datasetModel,
                             'errors' => [
-                                Yii::t("app/messages", "CSV file headers does not match variables used in this experiment. The following Variables are not associated to this experiment " ) . "(" . implode(",", $variablesNotInExperiment) . ")"
+                                Yii::t("app/messages", "CSV file headers does not match selected variables")
                             ]
                 ]);
             }
@@ -581,178 +432,23 @@ class DatasetController extends Controller {
             ]);
         }
     }
-    
-      /**
-     * register the sensor data with the associated provenance and documents
-     * @return mixed
-     */
-    public function actionCreateOnSensor() {
-        $datasetModel = new \app\models\yiiModels\YiiDataSensorModel();
-        $variablesModel = new \app\models\yiiModels\YiiVariableModel();
-
-        $token = Yii::$app->session[WSConstants::ACCESS_TOKEN];
-
-        // Load existing variables
-        $variables = $variablesModel->getInstancesDefinitionsUrisAndLabel($token);
-        $this->view->params["variables"] = $this->getVariablesListLabelToShowFromVariableList($variables);
-
-        // Load existing provenances
-        $provenanceService = new WSProvenanceModel();
-        $provenances = $this->mapProvenancesByUri($provenanceService->getAllProvenances($token));
-        $this->view->params["provenances"] = $provenances;
-        
-        // Load existing sensors
-        $sensors = $this->getSensorsUrisTypesLabels($token);
-        $this->view->params["sensingDevices"] = $this->getSensorListToShowFromSensorList($sensors);
-
-         // Load existing agents
-        $userModel = new \app\models\yiiModels\YiiUserModel();
-        $users = $userModel->getPersonsMailsAndName($token);
-        $this->view->params['agents'] = $users;
-        //If the form is complete, register data
-        if ($datasetModel->load(Yii::$app->request->post())) {
-            //Store uploaded CSV file
-            $document = UploadedFile::getInstance($datasetModel, 'file');
-            $serverFilePath = \config::path()['documentsUrl'] . "DatasetFiles/" . $document->name;
-            $document->saveAs($serverFilePath);
-
-            //Read CSV file content
-            $fileContent = str_getcsv(file_get_contents($serverFilePath), "\n");
-            $csvHeaders = str_getcsv(array_shift($fileContent), Yii::$app->params['csvSeparator']);
-            unlink($serverFilePath);
-
-            //Loaded given variables
-            $givenVariables = $datasetModel->variables;
-
-            // Check CSV header with variables
-            if (array_slice($csvHeaders, 1) === $givenVariables) {
-                // Get selected or create Provenance URI
-                if (!array_key_exists($datasetModel->provenanceUri, $provenances)) {
-                    $provenanceUri = $this->createProvenance(
-                            $datasetModel->provenanceUri,
-                            $datasetModel->provenanceComment,
-                            $datasetModel->provenanceSensingDevices,
-                            $datasetModel->provenanceAgents
-                    );
-                    $datasetModel->provenanceUri = $provenanceUri;
-                    $provenances = $this->mapProvenancesByUri($provenanceService->getAllProvenances($token));
-                    $this->view->params["provenances"] = $provenances;
-                } else {
-                    $provenanceUri = $datasetModel->provenanceUri;
-                }
-
-                // If provenance sucessfully created
-                if ($provenanceUri) {
-                    // Link uploaded documents to provenance URI
-                    $linkDocuments = true;
-                    if (is_array($datasetModel->documentsURIs) && is_array($datasetModel->documentsURIs["documentURI"])) {
-                        $linkDocuments = $this->linkDocumentsToProvenance(
-                                $provenanceUri,
-                                $datasetModel->documentsURIs["documentURI"]
-                        );
-                    }
-
-                    $datasetModel->documentsURIs = null;
-                      
-                    if ($linkDocuments === true) {
-                        // Save CSV data linked to provenance URI
-                        $values = [];
-                        $scientifObjectUri = null;
-                        foreach ($fileContent as $rowStr) {
-                            $row = str_getcsv($rowStr, Yii::$app->params['csvSeparator']);
-                            $date = $row[0];
-                            for ($i = 1; $i < count($row); $i++) {
-                                $values[] = [
-                                    "provenanceUri" => $provenanceUri,
-                                    "objectUri" => $scientifObjectUri,
-                                    "variableUri" => array_search($givenVariables[$i - 1], $variables),
-                                    "date" => $date,
-                                    "value" => $row[$i]
-                                ];
-                            }
-                        }
-                        
-                        $dataService = new WSDataModel();
-                        $result = $dataService->post($token, "/", $values);
-//                        var_dump($result);exit;
-                        // If data successfully saved
-                        if (is_array($result->metadata->datafiles) && count($result->metadata->datafiles) > 0) {
-                            $arrayData = $this->csvToArray($fileContent);
-                            return $this->render('_form_dataset_created', [
-                                        'model' => $datasetModel,
-                                        'handsontable' => $this->generateHandsontableDataset($csvHeaders, $arrayData),
-                                        'insertedDataNumber' => count($arrayData)
-                            ]);
-                        } else {
-
-                            return $this->render('create_on_sensor', [
-                                        'model' => $datasetModel,
-                                        'errors' => $result->metadata->status
-                            ]);
-                        }
-                    } else {
-                        return $this->render('create_on_sensor', [
-                                    'model' => $datasetModel,
-                                    'errors' => [
-                                        Yii::t("app/messages", "Error while creating linked documents")
-                                    ]
-                        ]);
-                    }
-                } else {
-                    return $this->render('create_on_sensor', [
-                                'model' => $datasetModel,
-                                'errors' => [
-                                    Yii::t("app/messages", "Error while creating provenance")
-                                ]
-                    ]);
-                }
-            } else {
-                return $this->render('create_on_sensor', [
-                            'model' => $datasetModel,
-                            'errors' => [
-                                Yii::t("app/messages", "CSV file headers does not match selected variables")
-                            ]
-                ]);
-            }
-        } else {
-            return $this->render('create_on_sensor', [
-                        'model' => $datasetModel,
-            ]);
-        }
-    }
 
     /**
      * Create provenance from an alias and a comment
-     * @param type $alias label of the provenance
-     * @param type $comment comment linked to the provenance
-     * @param type $sensingDevice uri of the sensor
-     * @param String $agent uri of the agent
+     * @param type $alias
+     * @param type $comment
      * @return boolean
      */
-    private function createProvenance($alias, $comment,$sensingDevice = null, $agent =null) {
+    private function createProvenance($alias, $comment) {
         $provenanceService = new WSProvenanceModel();
         $date = new \DateTime();
-        $metadata = [
-            "namespaces" => Yii::$app->params[self::PROVENANCE_PARAMS_VALUES],
-            "creationDate" => $date->format("Y-m-d\TH:i:sO"),
-            "prov:Agent" =>[
-                "oeso:SensingDevice" => [
-                ],
-                "oeso:Operator" => [
-                ]
-              ],
-            ];
-        if($sensingDevice != null){
-            $metadata["prov:Agent"]["oeso:SensingDevice"] = $sensingDevice;
-        }
-        if($agent != null){
-            $metadata["prov:Agent"]["oeso:Operator"] = $agent;
-        }
         $provenanceUri = $provenanceService->createProvenance(
                 Yii::$app->session['access_token'],
                 $alias,
                 $comment,
-                $metadata
+                [
+                    "creationDate" => $date->format("Y-m-d\TH:i:sO")
+                ]
         );
 
         if (is_string($provenanceUri) && $provenanceUri != "token") {
@@ -796,49 +492,5 @@ class DatasetController extends Controller {
             return true;
         }
     }
-    
-    /**
-     * Gets all sensors.
-     * @return sensors 
-     */
-    public function getSensorsUrisTypesLabels() {
-        $model = new \app\models\yiiModels\SensorSearch();
-        $model->page = 0;
-        $model->pageSize = 10000;
-        $sensorsUrisTypesLabels = [];
-        $sensors = $model->search(Yii::$app->session[WSConstants::ACCESS_TOKEN], null);
-        if ($sensors === WSConstants::TOKEN_INVALID) {
-            return WSConstants::TOKEN_INVALID;
-        } else {
-            foreach ($sensors->models as $sensor) {
-                $sensorsUrisTypesLabels[] =
-                    [
-                        self::SENSOR_DATA_URI => $sensor->uri,
-                        self::SENSOR_DATA_LABEL => $sensor->label,
-                        self::SENSOR_DATA_TYPE => $sensor->rdfType
-                    ];
-            }
-        }
-        return $sensorsUrisTypesLabels;
-    }
-    
-    /**
-     * 
-     * @param type $sensorsUriTypesLabel
-     * @return array
-     */
-    public function getSensorListToShowFromSensorList($sensorsUriTypesLabel) {
-        $sensorLabelListToShow = [];
-        foreach ($sensorsUriTypesLabel as $sensorUriTypesLabel) {
-            $sensorType = Vocabulary::prettyUri($sensorUriTypesLabel[self::SENSOR_DATA_TYPE]);
-            if (isset($sensorLabelListToShow[$sensorType])) {
-                $sensorLabelListToShow[$sensorType][$sensorUriTypesLabel[self::SENSOR_DATA_URI]] = $sensorUriTypesLabel[self::SENSOR_DATA_LABEL];
-            } else {
-                $sensorLabelListToShow[$sensorType] = [
-                $sensorUriTypesLabel[self::SENSOR_DATA_URI] => $sensorUriTypesLabel[self::SENSOR_DATA_LABEL]
-                ];
-            }
-        }
-        return $sensorLabelListToShow;
-    }
+
 }
