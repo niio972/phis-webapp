@@ -1,26 +1,25 @@
 <?php
 
 //**********************************************************************************************
-//                                       YiiDatasetModel.php 
+//                                       YiiDataSensorModel.php 
 //
 // Author(s): Morgane VIDAL
 // PHIS-SILEX version 1.0
 // Copyright © - INRA - 2017
 // Creation date: October 2017
-// Contact: morgane.vidal@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
-// Last modification date:  October, 2 2017
-// Subject: The Yii model for the dataset. Used with web services
+// Contact: arnaud.charleroy@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
+// Last modification date:  November, 2 2019
+// Subject: The Yii model for the sensor dataset. Used with web services
 //***********************************************************************************************
 
 namespace app\models\yiiModels;
 
 use Yii;
 use app\models\yiiModels\YiiDatasetModel;
-use app\models\wsModels\WSDatasetModel;
 
 /**
  * Model for the dataset. Used with web services
- * @author Morgane Vidal <morgane.vidal@inra.fr>
+ * @author Arnaud Charleroy <arnaud.charleroy@inra.fr>
  */
 class YiiDataSensorModel extends YiiDatasetModel {
 
@@ -41,8 +40,6 @@ class YiiDataSensorModel extends YiiDatasetModel {
     public function attributeLabels() {
         $rules =  parent::attributeLabels();
         $rules['variables'] = Yii::t('app', 'Variable(s)');
-
         return $rules;
     }
-
 }
