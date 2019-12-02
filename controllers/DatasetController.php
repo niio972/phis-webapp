@@ -622,9 +622,9 @@ class DatasetController extends Controller {
     private function createProvenance($alias, $comment,$sensingDevice = null, $agent =null) {
         $provenanceService = new WSProvenanceModel();
         $date = new \DateTime();
+        $created = $date->format("Y-m-d\TH:i:sO");
         $metadata = [
             "namespaces" => Yii::$app->params[self::PROVENANCE_PARAMS_VALUES],
-            "creationDate" => $date->format("Y-m-d\TH:i:sO"),
             "prov:Agent" =>[
                 "oeso:SensingDevice" => [
                 ],
@@ -642,6 +642,7 @@ class DatasetController extends Controller {
                 Yii::$app->session['access_token'],
                 $alias,
                 $comment,
+                $created,
                 $metadata
         );
 

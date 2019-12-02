@@ -31,22 +31,24 @@ class WSProvenanceModel extends WSModel {
 
     /**
      * Create provenance with label, comment and metadata
-     * @param type $sessionToken
-     * @param type $label
-     * @param type $comment
-     * @param type $metadata
+     * @param string $sessionToken
+     * @param string $label
+     * @param string $comment
+     * @param string $created
+     * @param array $metadata
      * @return type
      */
-    public function createProvenance($sessionToken, $label, $comment, $metadata) {
+    public function createProvenance($sessionToken, $label, $comment, $created, $metadata) {
         $subService = "/";
         $provenance = $this->post($sessionToken, $subService, [[
         "label" => $label,
         "comment" => $comment,
+        "created" => $created,
         "metadata" => $metadata,
         ]]);
 
         if (
-                isset($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) && count($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) == 1
+            isset($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) && count($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) == 1
         ) {
             return $provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}[0];
         } else {
