@@ -19,15 +19,12 @@ use Yii;
 use yii\web\Controller;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
-use app\models\yiiModels\YiiDocumentModel;
 use app\models\wsModels\WSProvenanceModel;
 use app\models\wsModels\WSDataModel;
-use app\models\yiiModels\YiiConcernedItemModel;
 use openSILEX\handsontablePHP\adapter\HandsontableSimple;
 use openSILEX\handsontablePHP\classes\ColumnConfig;
 use app\models\wsModels\WSConstants;
 use app\models\yiiModels\YiiExperimentModel;
-use app\models\yiiModels\YiiSensorModel;
 use app\components\helpers\Vocabulary;
 
 require_once '../config/config.php';
@@ -132,15 +129,9 @@ class DatasetController extends Controller {
         foreach ($variables as $variableAlias) {
             $fileColumns[] = $variableAlias;
         }
-
-        $csvPath = "coma";
-        if (Yii::$app->params['csvSeparator'] == ";") {
-            $csvPath = "semicolon";
-        }
         
-        $file = fopen('./documents/DatasetFiles/' . $csvPath . '/datasetTemplate.csv', 'w');
-        fputcsv($file, $fileColumns, $delimiter = Yii::$app->params['csvSeparator']);
-        fclose($file);
+        $csvString = implode(Yii::$app->params['csvSeparator'], $fileColumns); 
+        return json_encode($csvString);
     }
     
      /**
@@ -156,15 +147,9 @@ class DatasetController extends Controller {
         foreach ($variables as $variableAlias) {
             $fileColumns[] = $variableAlias;
         }
-       
-        $csvPath = "coma";
-        if (Yii::$app->params['csvSeparator'] == ";") {
-            $csvPath = "semicolon";
-        }
         
-        $file = fopen('./documents/DatasetFiles/' . $csvPath . '/datasetSensorTemplate.csv', 'w');
-        fputcsv($file, $fileColumns, $delimiter = Yii::$app->params['csvSeparator']);
-        fclose($file);
+        $csvString = implode(Yii::$app->params['csvSeparator'], $fileColumns); 
+        return json_encode($csvString);
     }
 
   
@@ -373,7 +358,9 @@ class DatasetController extends Controller {
             //Loaded given variables
             $experimentController = new ExperimentController();
             $experimentVariables = $experimentController->getExperimentMesuredVariablesSelectList($datasetModel->experiment) ;
-            $csvVariables = array_slice($csvHeaders, 2);
+            $csvRawVariables = array_slice($csvHeaders, 2);
+            // clean variables name
+            $csvVariables = array_map('trim', $csvRawVariables);
             // select all variables that don"t exist in experiment variables
             $variablesNotInExperiment = array_diff($csvVariables, array_values($experimentVariables)); 
             // Check CSV header with variables
@@ -382,6 +369,7 @@ class DatasetController extends Controller {
                     $SciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
                     $SciencitificObjectSearch->experiment = $datasetModel->experiment;
                     $SciencitificObjectSearch->pageSize = 30000;
+                    $SciencitificObjectSearch->setWithProperties(false);
                     $SciencitificObjectSearchResults = $SciencitificObjectSearch->search($token);
 
                     $objectUris = [];
@@ -477,12 +465,14 @@ class DatasetController extends Controller {
         
         // Load existing sensors
         $sensors = $this->getSensorsUrisTypesLabels($token);
+        $this->view->params["sensingDevicesUriLabel"] = $this->getSensorListByUriAndLabel($sensors);
         $this->view->params["sensingDevices"] = $this->getSensorListToShowFromSensorList($sensors);
 
          // Load existing agents
         $userModel = new \app\models\yiiModels\YiiUserModel();
-        $users = $userModel->getPersonsMailsAndName($token);
+        $users = $userModel->getPersonsURIAndName($token);
         $this->view->params['agents'] = $users;
+        
         //If the form is complete, register data
         if ($datasetModel->load(Yii::$app->request->post())) {
             //Store uploaded CSV file
@@ -579,7 +569,7 @@ class DatasetController extends Controller {
     }
     
     /**
-     * 
+     * Format sensor by type and uri => label
      * @param type $sensorsUriTypesLabel
      * @return array
      */
@@ -596,5 +586,17 @@ class DatasetController extends Controller {
             }
         }
         return $sensorLabelListToShow;
+    }
+     /**
+     * Format sensor by uri => label
+     * @param type $sensorsUriTypesLabel
+     * @return array
+     */
+    public function getSensorListByUriAndLabel($sensorsUriTypesLabel) {
+        $sensorsListByUriAndLabel = [];
+        foreach ($sensorsUriTypesLabel as $sensorUriTypesLabel) {
+            $sensorsListByUriAndLabel[$sensorUriTypesLabel[self::SENSOR_DATA_URI]] = $sensorUriTypesLabel[self::SENSOR_DATA_LABEL];
+        }
+        return $sensorsListByUriAndLabel;
     }
 }

@@ -21,12 +21,6 @@ use app\models\yiiModels\YiiConcernedItemModel;
 class ProvenanceController extends Controller {
     
     /**
-     * Provenance config namespaces
-     */
-    const PROVENANCE_PARAMS_VALUES = "provenanceNamespaces";
-    
-    
-    /**
      * Define the behaviors
      * 
      * @return array
@@ -76,6 +70,28 @@ class ProvenanceController extends Controller {
     }
     
     /**
+     * Update provenance documents from post data 
+     * [
+     *  provenance : { label, comment, metadata:{ ... } },
+     *  documents : { uri1,uri2}
+     * ]
+     */
+    public function actionAjaxUpdateProvenanceDocumentsFromDataset(){
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $data = Yii::$app->request->post();
+        
+        $documents = [];
+        
+        $provenanceUri = $data["provenanceUri"];
+        if(isset($data["documents"])){
+            $documents = $data["documents"];
+        }
+        
+        return $this->linkDocumentsToProvenance($provenanceUri, $documents);
+    }
+    
+    /**
      * Return an array with provenance list with all characteristics
      * and provenance label mapped with provenance uri
      * @return array
@@ -99,31 +115,36 @@ class ProvenanceController extends Controller {
     
     /**
      * Create provenance from an alias and a comment
-     * @param type $alias label of the provenance
-     * @param type $comment comment linked to the provenance
-     * @param type $sensingDevice uri of the sensor
-     * @param String $agent uri of the agent
+     * @param string $alias label of the provenance
+     * @param string $comment comment linked to the provenance
+     * @param array $sensingDevices uri of the sensor
+     * @param array $agents uri of the agent
      * @return boolean
      */
-    private function createProvenance($alias, $comment,$sensingDevice = null, $agent =null) {
+    private function createProvenance($alias, $comment,$sensingDevices = [], $agents = []) {
         $provenanceService = new WSProvenanceModel();
         $date = new \DateTime();
         $createdDate = $date->format("Y-m-d\TH:i:sO");
-        $metadata = [
-            "namespaces" => Yii::$app->params[self::PROVENANCE_PARAMS_VALUES],
-            "prov:Agent" =>[
-                "oeso:SensingDevice" => [
-                ],
-                "oeso:Operator" => [
-                ]
-              ],
+        $metadata = [];
+        foreach ($sensingDevices as $sensingDevice) {
+            if(!isset($metadata["prov:Agent"])){
+                $metadata["prov:Agent"] = [];
+            }
+          $metadata["prov:Agent"][] = [
+              "prov:id" =>  $sensingDevice,
+              "rdf:type" => "oeso:SensingDevice"
             ];
-        if($sensingDevice != null){
-            $metadata["prov:Agent"]["oeso:SensingDevice"] = $sensingDevice;
         }
-        if($agent != null){
-            $metadata["prov:Agent"]["oeso:Operator"] = $agent;
+        foreach ($agents as $agent) {
+            if(!isset($metadata["prov:Agent"])){
+                $metadata["prov:Agent"] = [];
+            }
+            $metadata["prov:Agent"][] = [
+                "prov:id" => $agent,
+                "rdf:type" => "oeso:Operator"
+            ];
         }
+            
         $provenanceUri = $provenanceService->createProvenance(
                 Yii::$app->session['access_token'],
                 $alias,
@@ -207,7 +228,7 @@ class ProvenanceController extends Controller {
             
                 $provenanceService = new WSProvenanceModel();
                 $jsonValueFilter =[];
-                $jsonValueFilter["metadata.prov:Agent.oeso:SensingDevice"]= ["\$all" => $data["sensorUris"]];
+                $jsonValueFilter["metadata.prov:Agent.prov:id"]= ["\$all" => $data["sensorUris"]];
                 $provenancesFiltered = $provenanceService->getSpecificProvenancesByCriteria(
                 $token,
                     ['jsonValueFilter' => json_encode($jsonValueFilter)]

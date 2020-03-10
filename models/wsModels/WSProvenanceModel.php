@@ -40,6 +40,9 @@ class WSProvenanceModel extends WSModel {
      */
     public function createProvenance($sessionToken, $label, $comment,$createdDate, $metadata) {
         $subService = "/";
+        if(empty($metadata)){
+            $metadata = (object) array();
+        }
         $provenance = $this->post($sessionToken, $subService, [[
         "label" => $label,
         "comment" => $comment,
@@ -48,7 +51,7 @@ class WSProvenanceModel extends WSModel {
         ]]);
 
         if (
-                isset($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) && count($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) == 1
+            isset($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) && count($provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}) == 1
         ) {
             return $provenance->{WSConstants::METADATA}->{WSConstants::DATA_FILES}[0];
         } else {
