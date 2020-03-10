@@ -25,6 +25,7 @@ use openSILEX\handsontablePHP\adapter\HandsontableSimple;
 use openSILEX\handsontablePHP\classes\ColumnConfig;
 use app\models\wsModels\WSConstants;
 use app\models\yiiModels\YiiExperimentModel;
+use app\components\helpers\Vocabulary;
 
 require_once '../config/config.php';
 
@@ -49,6 +50,11 @@ class DatasetController extends Controller {
     const ERRORS_COLUMN = "Column";
     const ERRORS_MESSAGE = "Message";
     
+    const SENSORS_DATA = "sensors";
+    const SENSOR_DATA_URI = "sensorUri";
+    const SENSOR_DATA_LABEL = "sensorLabel";
+    const SENSOR_DATA_TYPE = "sensorType";
+
     /**
      * define the behaviors
      * @return array
@@ -128,11 +134,25 @@ class DatasetController extends Controller {
         return json_encode($csvString);
     }
     
-    
-    
-    
-   
-    
+     /**
+     * generate the csv file for the sensor dataset creation action. The csv file is
+     * generated with a column for each variable
+     * @param array variables list of the variables to add to the 
+     *                                file uri => alias
+     * @return mixed
+     */
+    public function actionGenerateAndDownloadSensorDatasetCreationFile() {
+        $fileColumns[] = DatasetController::DATE;
+        $variables = Yii::$app->request->post('variables');
+        foreach ($variables as $variableAlias) {
+            $fileColumns[] = $variableAlias;
+        }
+        
+        $csvString = implode(Yii::$app->params['csvSeparator'], $fileColumns); 
+        return json_encode($csvString);
+    }
+
+  
     /**
      * 
      * @param array $csvErrors the errors founded. 
@@ -424,4 +444,159 @@ class DatasetController extends Controller {
         }
     }
     
+      /**
+     * register the sensor data with the associated provenance and documents
+     * @return mixed
+     */
+    public function actionCreateOnSensor() {
+        $datasetModel = new \app\models\yiiModels\YiiDataSensorModel();
+        $variablesModel = new \app\models\yiiModels\YiiVariableModel();
+
+        $token = Yii::$app->session[WSConstants::ACCESS_TOKEN];
+
+        // Load existing variables
+        $variables = $variablesModel->getInstancesDefinitionsUrisAndLabel($token);
+        $this->view->params["variables"] = $this->getVariablesListLabelToShowFromVariableList($variables);
+
+        // Load existing provenances
+        $provenanceService = new WSProvenanceModel();
+        $provenances = $this->mapProvenancesByUri($provenanceService->getAllProvenances($token));
+        $this->view->params["provenances"] = $provenances;
+        
+        // Load existing sensors
+        $sensors = $this->getSensorsUrisTypesLabels($token);
+        $this->view->params["sensingDevicesUriLabel"] = $this->getSensorListByUriAndLabel($sensors);
+        $this->view->params["sensingDevices"] = $this->getSensorListToShowFromSensorList($sensors);
+
+         // Load existing agents
+        $userModel = new \app\models\yiiModels\YiiUserModel();
+        $users = $userModel->getPersonsURIAndName($token);
+        $this->view->params['agents'] = $users;
+        
+        //If the form is complete, register data
+        if ($datasetModel->load(Yii::$app->request->post())) {
+            //Store uploaded CSV file
+            $document = UploadedFile::getInstance($datasetModel, 'file');
+            $serverFilePath = \config::path()['documentsUrl'] . "DatasetFiles/" . $document->name;
+            $document->saveAs($serverFilePath);
+
+            //Read CSV file content
+            $fileContent = str_getcsv(file_get_contents($serverFilePath), "\n");
+            $csvHeaders = str_getcsv(array_shift($fileContent), Yii::$app->params['csvSeparator']);
+            unlink($serverFilePath);
+
+            $sensorController = new SensorController();
+            $sensorVariables = $sensorController->getSensorMeasuredVariablesSelectList($datasetModel->provenanceSensingDevices) ;
+            $csvVariables = array_slice($csvHeaders, 1);
+            // select all variables that don"t exist in experiment variables
+            $variablesNotInSensor = array_diff($csvVariables, array_values($sensorVariables)); 
+     
+            // Check CSV header with variables
+            if (count($variablesNotInSensor) === 0) {
+                // Get selected or create Provenance URI
+               $provenanceUri = $datasetModel->provenanceUri;
+                // Save CSV data linked to provenance URI
+                $values = [];
+                foreach ($fileContent as $rowStr) {
+                    $row = str_getcsv($rowStr, Yii::$app->params['csvSeparator']);
+                    $date = $row[0];
+                    for ($i = 1; $i < count($row); $i++) {
+                        $values[] = [
+                            "provenanceUri" => $provenanceUri,
+                            "variableUri" => array_search($csvVariables[$i - 1], $sensorVariables),
+                            "date" => $date,
+                            "value" => $row[$i]
+                        ];
+                    }
+                }
+                
+                $dataService = new WSDataModel();
+                $result = $dataService->post($token, "/", $values);
+                // If data successfully saved
+                if (is_array($result->metadata->datafiles) && count($result->metadata->datafiles) > 0) {
+                    $arrayData = $this->csvToArray($fileContent);
+                    return $this->render('_form_dataset_created', [
+                                'model' => $datasetModel,
+                                'handsontable' => $this->generateHandsontableDataset($csvHeaders, $arrayData),
+                                'insertedDataNumber' => count($arrayData)
+                    ]);
+                } else {
+
+                    return $this->render('create_on_sensor', [
+                                'model' => $datasetModel,
+                                'errors' => $result->metadata->status
+                    ]);
+                }
+                    
+                } else {
+                    return $this->render('create_on_sensor', [
+                                'model' => $datasetModel,
+                                'errors' => [
+                                    Yii::t("app/messages", "CSV file headers does not match variables followed by this sensor. The following Variables are not associated to this sensor " ) . "(" . implode(",", $variablesNotInSensor) . ")"
+                                ]
+                    ]);
+            }
+        } else {
+            return $this->render('create_on_sensor', [
+                        'model' => $datasetModel,
+            ]);
+        }
+    }
+    
+    /**
+     * Gets all sensors.
+     * @return sensors 
+     */
+    public function getSensorsUrisTypesLabels() {
+        $model = new \app\models\yiiModels\SensorSearch();
+        $model->page = 0;
+        $model->pageSize = 10000;
+        $sensorsUrisTypesLabels = [];
+        $sensors = $model->search(Yii::$app->session[WSConstants::ACCESS_TOKEN], null);
+        if ($sensors === WSConstants::TOKEN_INVALID) {
+            return WSConstants::TOKEN_INVALID;
+        } else {
+            foreach ($sensors->models as $sensor) {
+                $sensorsUrisTypesLabels[] =
+                    [
+                        self::SENSOR_DATA_URI => $sensor->uri,
+                        self::SENSOR_DATA_LABEL => $sensor->label,
+                        self::SENSOR_DATA_TYPE => $sensor->rdfType
+                    ];
+            }
+        }
+        return $sensorsUrisTypesLabels;
+    }
+    
+    /**
+     * Format sensor by type and uri => label
+     * @param type $sensorsUriTypesLabel
+     * @return array
+     */
+    public function getSensorListToShowFromSensorList($sensorsUriTypesLabel) {
+        $sensorLabelListToShow = [];
+        foreach ($sensorsUriTypesLabel as $sensorUriTypesLabel) {
+            $sensorType = Vocabulary::prettyUri($sensorUriTypesLabel[self::SENSOR_DATA_TYPE]);
+            if (isset($sensorLabelListToShow[$sensorType])) {
+                $sensorLabelListToShow[$sensorType][$sensorUriTypesLabel[self::SENSOR_DATA_URI]] = $sensorUriTypesLabel[self::SENSOR_DATA_LABEL];
+            } else {
+                $sensorLabelListToShow[$sensorType] = [
+                $sensorUriTypesLabel[self::SENSOR_DATA_URI] => $sensorUriTypesLabel[self::SENSOR_DATA_LABEL]
+                ];
+            }
+        }
+        return $sensorLabelListToShow;
+    }
+     /**
+     * Format sensor by uri => label
+     * @param type $sensorsUriTypesLabel
+     * @return array
+     */
+    public function getSensorListByUriAndLabel($sensorsUriTypesLabel) {
+        $sensorsListByUriAndLabel = [];
+        foreach ($sensorsUriTypesLabel as $sensorUriTypesLabel) {
+            $sensorsListByUriAndLabel[$sensorUriTypesLabel[self::SENSOR_DATA_URI]] = $sensorUriTypesLabel[self::SENSOR_DATA_LABEL];
+        }
+        return $sensorsListByUriAndLabel;
+    }
 }
