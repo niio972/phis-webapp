@@ -123,15 +123,9 @@ class DatasetController extends Controller {
         foreach ($variables as $variableAlias) {
             $fileColumns[] = $variableAlias;
         }
-
-        $csvPath = "coma";
-        if (Yii::$app->params['csvSeparator'] == ";") {
-            $csvPath = "semicolon";
-        }
         
-        $file = fopen('./documents/DatasetFiles/' . $csvPath . '/datasetTemplate.csv', 'w');
-        fputcsv($file, $fileColumns, $delimiter = Yii::$app->params['csvSeparator']);
-        fclose($file);
+        $csvString = implode(Yii::$app->params['csvSeparator'], $fileColumns); 
+        return json_encode($csvString);
     }
     
     

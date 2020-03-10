@@ -21,12 +21,6 @@ use app\models\yiiModels\YiiConcernedItemModel;
 class ProvenanceController extends Controller {
     
     /**
-     * Provenance config namespaces
-     */
-    const PROVENANCE_PARAMS_VALUES = "provenanceNamespaces";
-    
-    
-    /**
      * Define the behaviors
      * 
      * @return array
@@ -131,21 +125,21 @@ class ProvenanceController extends Controller {
         $provenanceService = new WSProvenanceModel();
         $date = new \DateTime();
         $createdDate = $date->format("Y-m-d\TH:i:sO");
-        $metadata = [
-            "namespaces" => Yii::$app->params[self::PROVENANCE_PARAMS_VALUES],
-            "prov:Agent" =>[
-             ],
-            "prov:Entity" =>[
-             ]
-            ];
+        $metadata = [];
         foreach ($sensingDevices as $sensingDevice) {
+            if(!isset($metadata["prov:Agent"])){
+                $metadata["prov:Agent"] = [];
+            }
           $metadata["prov:Agent"][] = [
               "prov:id" =>  $sensingDevice,
               "rdf:type" => "oeso:SensingDevice"
             ];
         }
         foreach ($agents as $agent) {
-          $metadata["prov:Agent"][] = [
+            if(!isset($metadata["prov:Agent"])){
+                $metadata["prov:Agent"] = [];
+            }
+            $metadata["prov:Agent"][] = [
                 "prov:id" => $agent,
                 "rdf:type" => "oeso:Operator"
             ];

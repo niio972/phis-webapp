@@ -280,6 +280,28 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                 }
         }
         
+        // The download function takes a CSV string, the filename and mimeType as parameters
+        // Scroll/look down at the bottom of this snippet to see how download is called
+        function download(content, fileName, mimeType) {
+          var a = document.createElement('a');
+          mimeType = mimeType || 'application/octet-stream';
+
+          if (navigator.msSaveBlob) { // IE10
+            navigator.msSaveBlob(new Blob([content], {
+              type: mimeType
+            }), fileName);
+          } else if (URL && 'download' in a) { //html5 A[download]
+            a.href = URL.createObjectURL(new Blob([content], {
+              type: mimeType
+            }));
+            a.setAttribute('download', fileName);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+          }
+        }
         
     </script>
         <script>
@@ -291,6 +313,8 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
         }
         // Inject URI to get document widget linked to an URI
         echo 'documentsLoadUri = "' . Url::to(['document/get-documents-widget']) . '";';
+         // Inject provenances list indexed by URI
+        echo 'experiments = ' . json_encode($this->params['experiments']) . ';';
         // Inject provenances list indexed by URI
         echo 'provenances = ' . json_encode($this->params['provenances']) . ';';
         // Inject sensingDevices list indexed by URI
@@ -458,9 +482,12 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                     </div>               
                     
         <?= 
-        Html::a("<button type='button' class='btn btn-success'> " . Yii::t('app', 'Download Template') . "</button>",
-            \config::path()['basePath'] . 'documents/DatasetFiles/' . $csvPath . '/datasetTemplate.csv',
-            ['id' => 'downloadDatasetTemplate']
+        Html::button(
+                Yii::t('app', 'Download Template'),
+                [
+                'id' => 'downloadDatasetTemplate',
+                'class' => 'btn btn-success'  
+                ]
         );
         ?>
                 <br><br>
@@ -469,7 +496,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                                  icon="ti-settings"
                                  :before-change="beforeUploadDataset">
                        <h4><?= Yii::t('app', 'Provenance'); ?></h4>
-                <p class="alert alert-info"><?= Yii::t('app/messages', 'To create a new provenance, write the provenance label in the research field and press `Enter`'); ?></p>
+                <p class="alert alert-info"><?= Yii::t('app/messages', 'To create a new provenance, write the provenance label in the research field and press `Enter`. After you will be able to fill provenance input fields and create it by press `Create provenance` button.'); ?></p>
     
         <?=
         $form->field($model, 'provenanceUri')->widget(\kartik\select2\Select2::classname(), [
@@ -583,8 +610,8 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
              methods: {
                 onComplete: function(){
                     this.loadingWizard = true;
-                    $("button.wizard-btn").attr('disabled','disabled');
                     $("#<?= $form->getId() ?>").submit();
+                    $("button.wizard-btn").attr('disabled','disabled');
                 },
                 setLoading: function(value) {
                       this.loadingWizard = value;
@@ -596,9 +623,10 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                       return new Promise((resolve, reject) => {
                           setTimeout(() => {
                               let experimentUri = $("#experiment-selector").val();
-                              if(experimentUri === undefined || experimentUri === null || experimentUri === "" ){
-                                  toastr.warning("You must select a valid experiment to continued");
-                                  reject("You must select a valid experiment to continue");
+                              
+                              if(experimentUri === undefined || experimentUri === null || experimentUri === ""|| !experiments.hasOwnProperty(experimentUri)){
+                                  toastr.warning("You must select a valid experiment to be able to continue");
+                                  reject("You must select a valid experiment to be able to continue");
                               }else{
                                  resolve(true);
                                 }   
@@ -613,7 +641,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                                       provenanceUri === null ||
                                       provenanceUri === "" ||
                                       !provenances.hasOwnProperty(provenanceUri)){
-                                  toastr.warning("You must select a valid provenance to continued");
+                                  toastr.warning("You must select a valid provenance to be able to continue");
                                   reject("You must select a valid provenance to continue");
                               }else{
                                  resolve(true);
@@ -630,7 +658,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                                     formVue.loadingWizard = false;
                                       resolve(true);
                                 }else{
-                                     toastr.warning("You must select a valid data file to continued");
+                                     toastr.warning("You must select a valid data file to be able to continue");
                                   reject("You must select a valid provenance to continue");
                                   
                                 }
@@ -711,31 +739,38 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
 
       
         // Download adjusted to variables CSV template file on click
-        $(document).on('change', '#uriVariable-selector', function () {
+        $(document).on('click', '#downloadDatasetTemplate', function (event) {
+            event.preventDefault();
             var variablesLabels = [];
             $("#uriVariable-selector :selected").each(function (i, sel) {
                 variablesLabels.push($(sel).text());
             });
-            $.ajax({
-                url: 'index.php?r=dataset%2Fgenerate-and-download-dataset-creation-file',
-                type: 'POST',
-                datatype: 'json',
-                data: {variables: variablesLabels}
-            })
-            .done(function (data) {
-            })
-            .fail(function (jqXHR, textStatus) {
-                $('#document-save-msg').parent().removeClass('alert-info');
-                $('#document-save-msg').parent().addClass('alert-danger');
-                $('#document-save-msg').html('Request failed: ' + textStatus);
-            });
+            if(variablesLabels.length > 0){
+                $.ajax({
+                    url: 'index.php?r=dataset%2Fgenerate-and-download-dataset-creation-file',
+                    type: 'POST',
+                    datatype: 'json',
+                    data: {variables: variablesLabels}
+                })
+                .done(function (csvContent) {
+                    console.log(csvContent);
+                    download(csvContent, 'datasetTemplate.csv', 'text/csv;encoding:utf-8');
+                })
+                .fail(function (jqXHR, textStatus) {
+                    $('#document-save-msg').parent().removeClass('alert-info');
+                    $('#document-save-msg').parent().addClass('alert-danger');
+                    $('#document-save-msg').html('Request failed: ' + textStatus);
+                });
+            }else{
+                toastr.warning("You must selected at least one variable");
+            }
         });
         
         // On provenance change update provenance fields
         $("#experiment-selector").change(function () {
              populateVariableList($(this).val());
         });
-         populateVariableList($("#experiment-selector").val());
+        populateVariableList($("#experiment-selector").val());
         
         // On provenance change update provenance fields
         $("#provenance-selector").change(function () {
