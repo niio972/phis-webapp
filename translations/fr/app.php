@@ -33,6 +33,7 @@ return [
     '{n, plural, =1{Experiment} other{Experiments}}' => '{n, plural, =1{Expérimentation} other{Expérimentations}}',
     '{n, plural, =1{Group} other{Groups}}' => '{n, plural, =1{Groupe} other{Groupes}}',
     '{n, plural, =1{Person} other{Persons}}' => '{n, plural, =1{Personne} other{Personnes}}',
+    '{n, plural, =1{Profile} other{Profiles}}' => '{n, plural, =1{Profil} other{Profils}}',
     '{n, plural, =1{Project} other{Projects}}' => '{n, plural, =1{Projet} other{Projets}}',
     '{n, plural, =1{Radiometric Target} other{Radiometric Targets}}' => '{n, plural, =1{Cible Radiométrique} other{Cibles Radiométriques}}',
     '{n, plural, =1{Scientific Object} other{Scientific Objects}}' => '{n, plural, =1{Objet Scientifique} other{Objets Scientifiques}}',
@@ -46,10 +47,11 @@ return [
 
     // A
     'Acquisition session template' => 'Gabarit de session d\'aquisition',
+    'Add an event'=>'Ajouter un événement',
     'Add Dataset' => 'Importer un jeu de données',
     'Add Document' => 'Ajouter un document',
     'Add Document Script' => 'Ajouter un script',
-    'Add on scientific object' => 'Importer pour un objet scientifique',
+    'Add on scientific object' => 'Importer pour des objet scientifique',
     'Add only on sensor' => 'Ajout des données capteurs',
     'Add row' => 'Ajouter une ligne',
     'Add Sensors' => 'Ajouter des Capteurs',
@@ -140,6 +142,7 @@ return [
     'Experiment'=>'Expérimentation',
     'Experiment Modalities' => 'Modalités Expérimentales',
     'Experiment associated variable(s)' => 'Variable(s) associées à l\'expérimentation',
+    'Export all Scientific Objects'=>'Export de tous les objets scientifiques',
     EventAction::EVENT_UNUPDATABLE_DUE_TO_UNUPDATABLE_PROPRTY_LABEL =>
         "L'événement ne peut être mis à jour que via le web service car une de "
         . "ses propriétés spécifiques n'est actuellement pas compatible avec la webapp.",
@@ -170,7 +173,7 @@ return [
     'Generate Map' => 'Générer la Carte',
     'Generated URI' => 'URI générée',
     'Generate dataset template' => 'Générer le gabarit du jeux de données',
-    'Generate dataset template (Optional)' => 'Generer le gabarit du jeu de données (Optionnel)',
+    'Generate dataset template (Optional)' => 'Générer le gabarit du jeu de données (Optionnel)',
     'Geographic Location' => 'Localisation géographique',
     'Geometry' => 'Géométrie',
     'Graphic visualization' => 'Visualisation graphique',
@@ -276,8 +279,8 @@ return [
     // S
     'Scientific Contacts' => 'Contacts scientifiques',
     'scientific objects' =>'objets scientifiques',
+    'Scientific object metadata'=>'Métadonnées de l\'objet scientifique',
     'Scientific Supervisors' => 'Superviseurs scientifiques',
-    'Search Criteria' =>'Critères de recherche',
     'See' => 'Voir',
     'Select all the' =>'Sélectionnez l\'ensemble des',
     'Select method alias...' => 'Sélectionnez l\'alias de la méthode',
