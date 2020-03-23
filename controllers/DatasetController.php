@@ -131,7 +131,7 @@ class DatasetController extends Controller {
         }
         
         $csvString = implode(Yii::$app->params['csvSeparator'], $fileColumns); 
-        return json_encode($csvString);
+        return $csvString;
     }
     
      /**
@@ -149,7 +149,7 @@ class DatasetController extends Controller {
         }
         
         $csvString = implode(Yii::$app->params['csvSeparator'], $fileColumns); 
-        return json_encode($csvString);
+        return $csvString;
     }
 
   
