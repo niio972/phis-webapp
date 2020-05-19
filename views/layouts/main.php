@@ -58,8 +58,22 @@ ToastrAsset::register($this);
         ],
     ]);
     $menuItems;
+    // DataAnalysis Menu
+     $menuDataAnalysisItems = [
+            'label' => Yii::t('app', 'Data Analysis'),
+                   'items' => [
+                       [
+                           'label' => Icon::show('bar-chart', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Standalone R App} other{Standalone R Apps}}', ['n' => 2]),
+                           'url' => ['/data-analysis/index'],
+                       ],
+                       [
+                        'label' => Icon::show('area-chart', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'R Gallery'),
+                        'url' => ['/data-analysis/gallery'],
+                        ]
+                   ]
+              ];
 
-    //unconnect user
+//unconnect user
     if (Yii::$app->session['isGuest'] || Yii::$app->session['isGuest'] === null) {
         if (Yii::$app->params['isDemo'] == true) {
             $menuItems = [['label' => Yii::t('app', 'Login'), 'options' => ['onclick' => "openDemoLogin(event)"]]];
@@ -70,10 +84,11 @@ ToastrAsset::register($this);
     } else if (Yii::$app->session['isAdmin']) {
         $menuItems[] = ['label' => Yii::t('app', 'Experimental Organization'),
                         'items' => [
-                            [
+                          /*  [
                                 'label' => Icon::show('home', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Scientific frame} other{Scientific frames}}', ['n' => 2]),
                                 'url' => ['/infrastructure'],
-                            ],
+                            ]
+                          ,*/
                             [
                                 'label' => Icon::show('folder-open', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Project} other{Projects}}', ['n' => 2]),
                                 'url' => ['/project/index'],
@@ -82,6 +97,10 @@ ToastrAsset::register($this);
                                 'label' => Icon::show('flask', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Experiment} other{Experiments}}', ['n' => 2]),
                                 'url' => ['/experiment/index']
                             ],
+//                            [
+//                                'label' => Icon::show('plus', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Germplasm'),
+//                                'url' => ['/germplasm/index']
+//                            ],                            
                             [
                                 'label' => Icon::show('leaf', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Scientific Object} other{Scientific Objects}}', ['n' => 2]),
                                 'url' => ['/scientific-object/index']
@@ -160,20 +179,9 @@ ToastrAsset::register($this);
 //                            ]
                             //\SILEX:info
                         ]];
-        if (Yii::$app->params['dataAnalysisModule'] == true) {
-            $menuItems[] = ['label' => Yii::t('app', 'Data Analysis'), 
-                            'items' => [
-                                [
-                                    'label' => Icon::show('bar-chart', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Standalone R App} other{Standalone R Apps}}', ['n' => 2]), 
-                                    'url' => ['/data-analysis/index' ,"integrated" => false],
-                                ],
-                                [
-                                    'label' => Icon::show('flask', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Try a R app'), 
-                                    'url' => ['/data-analysis/view-demo'],
-                                ]
-                             ]
-                            ];
-        }
+//        if (Yii::$app->params['dataAnalysisModule'] == true) {
+//            $menuItems[] = $menuDataAnalysisItems;
+//        }
         $menuItems[] = ['label' => Yii::t('app', 'Tools'),
                         'items' => [
                                 [
@@ -184,13 +192,17 @@ ToastrAsset::register($this);
                                     'label' => Icon::show('user', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Person} other{Persons}}', ['n' => 2]),
                                     'url' => ['/user/index']
                                 ],
+//                                [
+//                                'label' => Icon::show('cogs', [], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Profile} other{Profiles}}', ['n' => 2]),
+//                                    'url' => ['/profile/index']
+//                                ],
                                 [
                                     'label' => Icon::show('book', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Document} other{Documents}}', ['n' => 2]),
                                     'url' => ['/document/index']
                                 ],
                                 [
                                     'label' => Icon::show('fire', [], Icon::BSG) . " " . Yii::t('app', 'Web API'),
-                                    'url' => WS_PHIS_PATH_DOC
+                                    'url' => WS_PHIS_PATH_DOC . "/api-docs"
                                 ],
                                 [
                                     'label' => Icon::show('link', [], Icon::BSG) . " " . Yii::t('app', 'Documentation'),
@@ -224,10 +236,12 @@ ToastrAsset::register($this);
     } else {
         $menuItems[] = ['label' => Yii::t('app', 'Experimental Organization'),
                         'items' => [
+                            /*
                             [
                                 'label' => Icon::show('home', ['class' => 'fas'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Scientific frame} other{Scientific frames}}', ['n' => 2]),
                                 'url' => ['/infrastructure'],
                             ],
+                            */
                             [
                                 'label' => Icon::show('folder-open', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Project} other{Projects}}', ['n' => 2]),
                                 'url' => ['/project/index'],
@@ -263,7 +277,15 @@ ToastrAsset::register($this);
                                 [
                                     'label' => Icon::show('search', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'View'),
                                     'url' => ['/data/index']
-                                ]
+                                ],
+                                [
+                                    'label' => Icon::show('plus', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Add on scientific object'),
+                                    'url' => ['/dataset/create']
+                                ],
+                                [
+                                    'label' => Icon::show('plus', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Add only on sensor'),
+                                    'url' => ['/dataset/create-on-sensor']
+                                ],
                             ]
                         ];
         $menuItems[] = ['label' => Yii::t('app', 'Device'),
@@ -288,20 +310,9 @@ ToastrAsset::register($this);
 //                            ],
                             //\SILEX:info
                         ]];
-        if (Yii::$app->params['dataAnalysisModule'] == true) {
-            $menuItems[] = ['label' => Yii::t('app', 'Data Analysis'), 
-                            'items' => [
-                                [
-                                    'label' => Icon::show('bar-chart', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Standalone R App} other{Standalone R Apps}}', ['n' => 2]), 
-                                    'url' => ['/data-analysis/index' ,"integrated" => false],
-                                ],
-                                [
-                                    'label' => Icon::show('flask', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Try a R app'), 
-                                    'url' => ['/data-analysis/view-demo'],
-                                ]
-                             ]
-                            ];
-        }
+//        if (Yii::$app->params['dataAnalysisModule'] == true) {
+//            $menuItems[] = $menuDataAnalysisItems;
+//        }
         $menuItems[] = ['label' => Yii::t('app', 'Tools'),
                         'items' => [
                                 [
@@ -312,6 +323,10 @@ ToastrAsset::register($this);
                                     'label' => Icon::show('user', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Person} other{Persons}}', ['n' => 2]),
                                     'url' => ['/user/index']
                                 ],
+//                                [
+//                                    'label' => Icon::show('cogs', [], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Profile} other{Profiles}}', ['n' => 2]),
+//                                    'url' => ['/profile/index']
+//                                ],
                                 [
                                     'label' => Icon::show('book', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Document} other{Documents}}', ['n' => 2]),
                                     'url' => ['/document/index']
@@ -377,7 +392,7 @@ ToastrAsset::register($this);
 <footer class="footer">
     <div class="container">
         <p class="pull-left">
-          &copy; <?= $footerCopyrightWebappName; ?> v.3.3.0 - September, 13, 2019 ; <?= Yii::t('app/messages', 'Software is licensed under AGPL-3.0 and data under CC BY-NC-SA 4.0') ?>
+          &copy; <?= $footerCopyrightWebappName; ?> v.3.3.2 - May, 19, 2020 ; <?= Yii::t('app/messages', 'Software is licensed under AGPL-3.0') ?>
           <?php
           if (Yii::$app->params['opensilex-webapp-type'] === 'phis') {
               ?>

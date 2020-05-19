@@ -31,9 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?php
-            if (Yii::$app->session['isAdmin']) {
+//            if (Yii::$app->session['isAdmin']) {
                 echo Html::a(Yii::t('yii', 'Create') . ' ' . Yii::t('app', '{n, plural, =1{Sensor} other{Sensors}}', ['n' => 1]), ['create'], ['class' => 'btn btn-success']) . "\t";
-            }
+//            }
         ?>
     </p>
     
