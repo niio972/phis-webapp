@@ -17,7 +17,7 @@ use miloschuman\highcharts\Highcharts;
 ?>
 
 <div class="dataset-visualisation well">
- <h3><?= Yii::t('app', 'Data Visualization') ?> (<?= Yii::t('app', 'On selected plot(s)') ?>)</h3>
+ <h3><?= Yii::t('app', 'Data Visualization') ?> (<?= Yii::t('app', 'On selected scientific object(s)') ?>)</h3>
  
  
  <?php 
@@ -25,7 +25,7 @@ use miloschuman\highcharts\Highcharts;
           $series = [];
             foreach($data["agronomicalObjects"] as $agronomicalObjectData) {
                 if (array_key_exists("data", $agronomicalObjectData)) {
-                    $series[] = ['name' => $agronomicalObjectData["uri"],
+                    $series[] = ['name' => $agronomicalObjectData["label"],
                             'data' => $agronomicalObjectData["data"]];
                 }
             }

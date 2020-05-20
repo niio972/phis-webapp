@@ -16,7 +16,8 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use app\models\yiiModels\YiiModelsConstants;
-
+use app\models\yiiModels\YiiExperimentModel;
+use app\models\wsModels\WSConstants;
 /**
  * CRUD actions for YiiDataModel
  * 
@@ -46,13 +47,28 @@ class DataController extends Controller {
      * experiment map visualisation (layer view)
      * @return mixed
      */
-    public function actionSearchFromLayer() {
+    public function actionSearchFromLayer($id) {
         $searchModel = new \app\models\yiiModels\DataSearchLayers();
         
-        //1. get Variable uri list
-        $variableModel = new \app\models\yiiModels\YiiVariableModel($pageSize = 500);
-        $this->view->params["variables"] = $variableModel->getInstancesDefinitionsUrisAndLabel(Yii::$app->session['access_token']);
+        $sciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
+        $sciencitificObjectSearch->experiment = $id;
+        $sciencitificObjectSearch->pageSize = 1;
+       
+        $sciencitificObjectSearch->setWithProperties(false);
+         
         
+        
+        //1. get Variable uri list
+//        $variableModel = new \app\models\yiiModels\YiiVariableModel($pageSize = 500);
+//        $this->view->params["variables"] = $variableModel->getInstancesDefinitionsUrisAndLabel(Yii::$app->session['access_token']);
+//        
+        //1. get Variable uri list by experiment
+        $experimentModel = new YiiExperimentModel();
+        $variables = $experimentModel->getMeasuredVariables(
+                Yii::$app->session[WSConstants::ACCESS_TOKEN],
+                $id
+                );
+        $this->view->params["variables"] = $variables;
         if ($searchModel->load(Yii::$app->request->post())) {
             $scientificObjects = explode(",", Yii::$app->request->post()["agronomicalObjects"]);
             
@@ -64,6 +80,8 @@ class DataController extends Controller {
                 $searchModel->object = $scientificObject;
                 
                 $searchResult = $searchModel->search(Yii::$app->session['access_token'], Yii::$app->request->post());
+                $sciencitificObjectSearch->uri =$scientificObject;
+                $sciencitificObjectSearchResults = $sciencitificObjectSearch->search(Yii::$app->session[WSConstants::ACCESS_TOKEN]);
                 
                 /* Build array for highChart
                  * e.g : 
@@ -77,6 +95,7 @@ class DataController extends Controller {
                  *  }]
                  * }
                  */
+                $agronomicalObject["label"] = $sciencitificObjectSearchResults->getModels()[0]->label;
                 $agronomicalObject["uri"] = $searchModel->object;
                 foreach ($searchResult->getModels() as $model) {
                     $dataToSave = null;

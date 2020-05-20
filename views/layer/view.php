@@ -209,7 +209,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Map Visualization');
             });
             
              $(document).ready(function(){
-                $('#visualization-dataset').load('<?php echo Url::to(['data/search-from-layer']) ?>');
+                $('#visualization-dataset').load('<?php echo Url::to(['data/search-from-layer', 'id' => $model->objectURI]) ?>');
                 $('#visualization-images').load('<?php echo Url::to(['image/search-from-layer'])?>');
              });
              
@@ -219,7 +219,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Map Visualization');
                             //functionnality will be updated
                             //\SILEX:info
                             if (selectedPlots.length > 20) { 
-                                alert("Too many plots selected.");
+                                alert("Too many scientific objects selected.");
                             } else {
                                 var searchFormData = new FormData();
                                 var data = $('form').serializeArray();
@@ -241,7 +241,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Map Visualization');
                             searchFormData.append("agronomicalObjects", plots);
 
                             $.ajax({
-                               url: '<?php echo Url::to(['data/search-from-layer']) ?>', 
+                               url: '<?php echo Url::to(['data/search-from-layer', 'id' => $model->objectURI]) ?>', 
                                type: 'POST',
                                processData: false,
                                datatype: 'json',

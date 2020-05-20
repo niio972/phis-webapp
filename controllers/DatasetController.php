@@ -366,14 +366,14 @@ class DatasetController extends Controller {
             // Check CSV header with variables
             if (count($variablesNotInExperiment) === 0) {
                     $provenanceUri = $datasetModel->provenanceUri;
-                    $SciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
-                    $SciencitificObjectSearch->experiment = $datasetModel->experiment;
-                    $SciencitificObjectSearch->pageSize = 30000;
-                    $SciencitificObjectSearch->setWithProperties(false);
-                    $SciencitificObjectSearchResults = $SciencitificObjectSearch->search($token);
+                    $sciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
+                    $sciencitificObjectSearch->experiment = $datasetModel->experiment;
+                    $sciencitificObjectSearch->pageSize = 30000;
+                    $sciencitificObjectSearch->setWithProperties(false);
+                    $sciencitificObjectSearchResults = $sciencitificObjectSearch->search($token);
 
                     $objectUris = [];
-                    foreach ($SciencitificObjectSearchResults->getModels() as $object){
+                    foreach ($sciencitificObjectSearchResults->getModels() as $object){
                         $objectUris[$object->uri]=$object->label;
                     }
                     $datasetModel->documentsURIs = null;
