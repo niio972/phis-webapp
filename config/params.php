@@ -82,6 +82,7 @@ return [
     'moveFrom' => 'http://www.opensilex.org/vocabulary/oeev#MoveFrom',
     'moveTo' => 'http://www.opensilex.org/vocabulary/oeev#MoveTo',
     'AssociatedToASensor' => 'http://www.opensilex.org/vocabulary/oeev#AssociatedToASensor',
+    'installation' => 'http://www.opensilex.org/vocabulary/oeev#Installation',
 
     'Provenance' => 'http://www.opensilex.org/vocabulary/oeso#Provenance',
 
@@ -138,6 +139,7 @@ return [
     'from' => 'http://www.opensilex.org/vocabulary/oeev#from',
     'to' => 'http://www.opensilex.org/vocabulary/oeev#to',
     'associatedToASensor' => 'http://www.opensilex.org/vocabulary/oeev#associatedToASensor',
+    'position' => 'http://www.opensilex.org/vocabulary/oeev#hasDevicePosition',
 
     // Image filters
     'image.filter' => [

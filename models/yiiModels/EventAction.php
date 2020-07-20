@@ -1,4 +1,5 @@
 <?php
+
 //******************************************************************************
 //                               EventAction.php
 // PHIS-SILEX
@@ -6,6 +7,7 @@
 // Creation date: 06 March 2019
 // Contact: andreas.garcia@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
 //******************************************************************************
+
 namespace app\models\yiiModels;
 
 use Yii;
@@ -17,75 +19,91 @@ use app\models\wsModels\WSConstants;
  * @author Andréas Garcia <andreas.garcia@inra.fr>
  */
 class EventAction extends YiiEventModel {
-    
-    const EVENT_UNUPDATABLE_DUE_TO_UNUPDATABLE_PROPRTY_LABEL = 
-            'The event cannot be updated because one of its specific property'
+
+    const EVENT_UNUPDATABLE_DUE_TO_UNUPDATABLE_PROPRTY_LABEL = 'The event cannot be updated because one of its specific property'
             . ' isn\'t manageable by the interface';
-    
+
     /**
      * Date timezone offset.
      * @example +01:00
      * @var string
      */
     public $dateTimezoneOffset;
+
     const DATE_TIMEZONE_OFFSET = 'dateTimezoneOffset';
     const DATE_TIMEZONE_OFFSET_LABEL = 'Timezone offset';
-    
+
     /**
      * Date without timezone.
      * @example 1899-12-31T12:00:00
      * @var string
      */
     public $dateWithoutTimezone;
+
     const DATE_WITHOUT_TIMEZONE = 'dateWithoutTimezone';
     const DATE_WITHOUT_TIMEZONE_LABEL = self::DATE_LABEL;
-    
+
     /**
      * Concerned items URIs.
      * @example http://www.opensilex.org/demo/DMO2011-1
      * @var array of strings
      */
     public $concernedItemsUris;
+
     const CONCERNED_ITEMS_URIS = 'concernedItemsUris';
     const CONCERNED_ITEMS_URIS_LABEL = 'Concerned items URIs';
-    
+
     /**
      * Specific property hasPest.
      * @var YiiPropertyModel
      */
     public $propertyHasPest;
+
     const PROPERTY_HAS_PEST = 'propertyHasPest';
     const PROPERTY_HAS_PEST_LABEL = 'hasPest';
-    
+
     /**
      * Specific properties from.
      * @var YiiPropertyModel
      */
     public $propertyFrom;
+
     const PROPERTY_FROM = 'propertyFrom';
     const PROPERTY_FROM_LABEL = 'from';
-    
+
     /**
      * Specific properties to.
      * @var YiiPropertyModel
      */
     public $propertyTo;
+
     const PROPERTY_TO = 'propertyTo';
     const PROPERTY_TO_LABEL = 'to';
-    
+
     /**
      * Specific properties associated with.
      * @var YiiPropertyModel
      */
     public $propertyAssociatedToASensor;
+
     const PROPERTY_ASSOCIATED_TO_A_SENSOR = 'propertyAssociatedToASensor';
     const PROPERTY_ASOOCIATED_TO_A_SENSOR_LABEL = 'Associated to a sensor';
-    
+
+    /**
+     * Specific properties associated with.
+     * @var YiiPropertyModel
+     */
+    public $propertyPosition;
+
+    const PROPERTY_POSITION = 'propertyPosition';
+    const PROPERTY_POSITION_LABEL = 'Sensor position information';
+
     /**
      * Specific properties type.
      * @var YiiPropertyModel
      */
     public $propertyType;
+
     const PROPERTY_TYPE = 'propertyType';
     const PROPERTY_TYPE_LABEL = 'Property type';
 
@@ -94,61 +112,64 @@ class EventAction extends YiiEventModel {
      * @var string 
      */
     public $returnUrl;
+
     const RETURN_URL = "returnUrl";
-    
+
     /**
      * @inheritdoc
      */
     public function rules() {
         return [
             [[
-                self::TYPE, 
-                self::DATE_WITHOUT_TIMEZONE,
-                self::DATE_TIMEZONE_OFFSET,
-                self::DATE_WITHOUT_TIMEZONE,
-                self::CONCERNED_ITEMS_URIS
-            ],  'required'],
+            self::TYPE,
+            self::DATE_WITHOUT_TIMEZONE,
+            self::DATE_TIMEZONE_OFFSET,
+            self::DATE_WITHOUT_TIMEZONE,
+            self::CONCERNED_ITEMS_URIS
+                ], 'required'],
             [[
-                self::PROPERTY_HAS_PEST, 
-                self::PROPERTY_FROM, 
-                self::PROPERTY_TO, 
-                self::PROPERTY_ASSOCIATED_TO_A_SENSOR, 
-                self::RETURN_URL,
-            ],  'safe']
-        ]; 
+            self::PROPERTY_HAS_PEST,
+            self::PROPERTY_FROM,
+            self::PROPERTY_TO,
+            self::PROPERTY_ASSOCIATED_TO_A_SENSOR,
+            self::PROPERTY_POSITION,
+            self::RETURN_URL,
+                ], 'safe']
+        ];
     }
-    
+
     /**
      * @return array the labels of the attributes
      */
     public function attributeLabels() {
         return array_merge(
-            parent::attributeLabels(),
-            [
-                self::CONCERNED_ITEMS_URIS => Yii::t('app', self::CONCERNED_ITEMS_URIS_LABEL),
-                self::DATE_TIMEZONE_OFFSET => Yii::t('app', self::DATE_TIMEZONE_OFFSET_LABEL),
-                self::DATE_WITHOUT_TIMEZONE => Yii::t('app', self::DATE_WITHOUT_TIMEZONE_LABEL),
-                self::PROPERTY_HAS_PEST => Yii::t('app', self::PROPERTY_HAS_PEST_LABEL),
-                self::PROPERTY_FROM => Yii::t('app', self::PROPERTY_FROM_LABEL),
-                self::PROPERTY_TO => Yii::t('app', self::PROPERTY_TO_LABEL),
-                self::PROPERTY_ASSOCIATED_TO_A_SENSOR => Yii::t('app', self::PROPERTY_ASOOCIATED_TO_A_SENSOR_LABEL),
-            ]
+                parent::attributeLabels(),
+                [
+                    self::CONCERNED_ITEMS_URIS => Yii::t('app', self::CONCERNED_ITEMS_URIS_LABEL),
+                    self::DATE_TIMEZONE_OFFSET => Yii::t('app', self::DATE_TIMEZONE_OFFSET_LABEL),
+                    self::DATE_WITHOUT_TIMEZONE => Yii::t('app', self::DATE_WITHOUT_TIMEZONE_LABEL),
+                    self::PROPERTY_HAS_PEST => Yii::t('app', self::PROPERTY_HAS_PEST_LABEL),
+                    self::PROPERTY_FROM => Yii::t('app', self::PROPERTY_FROM_LABEL),
+                    self::PROPERTY_TO => Yii::t('app', self::PROPERTY_TO_LABEL),
+                    self::PROPERTY_ASSOCIATED_TO_A_SENSOR => Yii::t('app', self::PROPERTY_ASOOCIATED_TO_A_SENSOR_LABEL),
+                    self::PROPERTY_POSITION => Yii::t('app', self::PROPERTY_POSITION_LABEL),
+                ]
         );
     }
-    
+
     /**
      * @inheritdoc
      */
     public function attributesToArray() {
         $propertiesArray = [];
         foreach ($this->properties as $property) {
-            if(isset($property)) {
+            if (isset($property)) {
                 $propertiesArray[] = $property->attributesToArray();
             }
         }
         return [
             self::TYPE => $this->rdfType,
-            self::DATE => $this->dateWithoutTimezone.$this->dateTimezoneOffset,
+            self::DATE => $this->dateWithoutTimezone . $this->dateTimezoneOffset,
             self::CONCERNED_ITEMS_URIS => $this->concernedItemsUris,
             self::PROPERTIES => $propertiesArray,
         ];
@@ -174,7 +195,7 @@ class EventAction extends YiiEventModel {
             return $event;
         }
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -182,8 +203,9 @@ class EventAction extends YiiEventModel {
         parent::setAttributes($values, $safeOnly);
         $this->dateWithoutTimezone = str_replace(" ", "T", $this->dateWithoutTimezone);
         $this->properties = [$this->getPropertyInCreation()];
+          
     }
-    
+
     /**
      * Gets a property object according to the data entered in the creation form.
      * @param type $eventModel
@@ -206,10 +228,16 @@ class EventAction extends YiiEventModel {
                 $property->rdfType = $this->propertyType;
                 $property->relation = Yii::$app->params['associatedToASensor'];
                 break;
-            default : 
+            case Yii::$app->params['installation']:
+                $property->value = $this->propertyPosition;
+                $property->rdfType = $this->propertyType;
+                $property->relation = Yii::$app->params['position'];
+                break;
+            default :
                 $property = null;
                 break;
         }
         return $property;
     }
+
 }

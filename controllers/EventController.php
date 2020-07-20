@@ -246,8 +246,8 @@ class EventController extends GenericController {
             return $this->render('create', ['model' =>  $event]);
            
         // Submit form    
-        } else {   
-            $dataToSend[] = $event->attributesToArray(); 
+        } else {
+            $dataToSend[] = $event->attributesToArray();
             $requestResults =  $event->insert($sessionToken, $dataToSend);
             return $this->handlePostPutResponse($requestResults, $event->returnUrl);
         }
