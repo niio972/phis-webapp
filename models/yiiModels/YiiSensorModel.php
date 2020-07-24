@@ -101,6 +101,10 @@ class YiiSensorModel extends WSActiveRecord {
      */
     public $personInCharge;
     const PERSON_IN_CHARGE = "personInCharge";
+    
+    public $creator;
+    const CREATOR = "creator";
+    
     /**
      * the uri of documents linked to the sensor
      * @var string
@@ -152,7 +156,7 @@ class YiiSensorModel extends WSActiveRecord {
     public function rules() {
        return [ 
            [['rdfType', 'uri', 'inServiceDate', 'personInCharge', 'label', 'brand'], 'required'], 
-           [['serialNumber', 'model', 'dateOfPurchase', 'dateOfLastCalibration', 'documents','brand', 'label', 'inServiceDate', 'personInCharge', 'properties'], 'safe']
+           [['serialNumber', 'model', 'dateOfPurchase', 'dateOfLastCalibration', 'documents','brand', 'label', 'inServiceDate', 'personInCharge','creator', 'properties'], 'safe']
         ]; 
     }
     
@@ -165,6 +169,7 @@ class YiiSensorModel extends WSActiveRecord {
             'uri' => 'URI',
             'rdfType' => Yii::t('app', 'Type'),
             'label' => Yii::t('app', 'Alias'),
+            'creator' => Yii::t('app', 'Creator'),
             'brand' => Yii::t('app', 'Brand'),
             'serialNumber'=> Yii::t('app', 'Serial Number'),
             'inServiceDate' => Yii::t('app', 'In Service Date'),

@@ -117,6 +117,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                 toastr.info("Saving provenance ...");
                 provenance['label']= $("#provenance-selector :selected").val();
                 provenance['comment']= $("#yiidatasetmodel-provenancecomment").val();
+                provenance['experiments']= [$("#experiment-selector").val()];
                 provenance['documents']= [];
                 if($("#yiidatasetmodel-documentsuris").val() !== undefined){
                     provenance['documents']= $("#yiidatasetmodel-documentsuris").val();

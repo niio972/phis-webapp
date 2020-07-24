@@ -120,7 +120,7 @@ foreach ($model->properties as $property) {
                         "conceptLabel" => "measured variables",
                         "updateMessage" => Yii::t('app', 'Update measured variables'),
                         "infoMessage" => Yii::t('app/messages', 'When you change measured variables in the list, click on the check button to update them.'),
-                        "canUpdate" => Yii::$app->session['isAdmin'] ? true : false
+                        "canUpdate" => true
                     ]);
                 }
             ],
@@ -131,8 +131,7 @@ foreach ($model->properties as $property) {
                     $toReturn = "<ul>";
                     foreach ($model->properties as $property) {
                         $propertyLabel = explode("#", $property->relation)[1];
-
-                        if ($propertyLabel !== "type" 
+                         if ($propertyLabel !== "type" 
                                 && $propertyLabel !== "label" 
                                 && $propertyLabel !== "inServiceDate" 
                                 && $propertyLabel !== "personInCharge" 
@@ -143,6 +142,7 @@ foreach ($model->properties as $property) {
                                 && $propertyLabel !== "hasLens" 
                                 && $propertyLabel !== "measures"
                                 && $propertyLabel !== "hasModel"
+                                && $property->relation !== "http://purl.org/dc/terms/creator"
                         ) {
                             $toReturn .= "<li>"
                                     . "<b>" . explode("#", $property->relation)[1] . "</b>"
@@ -157,7 +157,7 @@ foreach ($model->properties as $property) {
                                     . "</li>";
                         }
                     }
-                    $toReturn .= "</ul>";
+                     $toReturn .= "</ul>";
                     return $toReturn;
                 },
             ]

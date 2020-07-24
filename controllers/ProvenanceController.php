@@ -58,7 +58,8 @@ class ProvenanceController extends Controller {
                             $provenance['label'],
                             $provenance['comment'],
                             $provenance['sensingDevices'],
-                            $provenance['agents']
+                            $provenance['agents'],
+                            $provenance['experiments']
                     );
         
         $this->linkDocumentsToProvenance($provenanceUri, $documents);
@@ -121,7 +122,7 @@ class ProvenanceController extends Controller {
      * @param array $agents uri of the agent
      * @return boolean
      */
-    private function createProvenance($alias, $comment,$sensingDevices = [], $agents = []) {
+    private function createProvenance($alias, $comment,$sensingDevices = [], $agents = [], $experiments = []) {
         $provenanceService = new WSProvenanceModel();
         $date = new \DateTime();
         $createdDate = $date->format("Y-m-d\TH:i:sO");
@@ -144,7 +145,7 @@ class ProvenanceController extends Controller {
                 "rdf:type" => "oeso:Operator"
             ];
         }
-            
+        $metadata["experiments"] = $experiments;
         $provenanceUri = $provenanceService->createProvenance(
                 Yii::$app->session['access_token'],
                 $alias,
