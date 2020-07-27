@@ -26,7 +26,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p> <?php if (Yii::$app->session['isAdmin'] || $model->email === Yii::$app->session['email']) { ?>
+    <p> <?php // if (Yii::$app->session['isAdmin'] || $model->email === Yii::$app->session['email']) { ?>
+        <?php // Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->email], ['class' => 'btn btn-primary']) ?>
+    <?php // } ?>
+            <p> <?php if ($model->email === "admin@opensilex.org" || $model->email === Yii::$app->session['email']) { ?>
         <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->email], ['class' => 'btn btn-primary']) ?>
     <?php } ?>
         <?php //Html::a('Delete', ['delete', 'id' => $model->uri], [
@@ -49,17 +52,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'phone',
             'address',
             'orcid', 
-            [
-                'attribute' => 'isAdmin',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    if ($model->isAdmin === "t" || $model->isAdmin === "true" || $model->isAdmin) {
-                        return Yii::t('app', 'Yes');
-                    } else {
-                        return Yii::t('app', 'No');
-                    }
-                }
-            ],
+//            [
+//                'attribute' => 'isAdmin',
+//                'format' => 'raw',
+//                'value' => function ($model) {
+//                    if ($model->isAdmin === "t" || $model->isAdmin === "true" || $model->isAdmin) {
+//                        return Yii::t('app', 'Yes');
+//                    } else {
+//                        return Yii::t('app', 'No');
+//                    }
+//                }
+//            ],
             [
                 'attribute' => 'available',
                 'format' => 'raw',
