@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <p> <?php // if (Yii::$app->session['isAdmin'] || $model->email === Yii::$app->session['email']) { ?>
         <?php // Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->email], ['class' => 'btn btn-primary']) ?>
     <?php // } ?>
-            <p> <?php if ($model->email === "admin@opensilex.org" || $model->email === Yii::$app->session['email']) { ?>
+            <p> <?php if (Yii::$app->session['email'] === "admin@opensilex.org" || $model->email === Yii::$app->session['email']) { ?>
         <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->email], ['class' => 'btn btn-primary']) ?>
     <?php } ?>
         <?php //Html::a('Delete', ['delete', 'id' => $model->uri], [
