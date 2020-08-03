@@ -34,19 +34,22 @@ class WSProvenanceModel extends WSModel {
      * @param type $sessionToken
      * @param type $label
      * @param type $comment
+     * @param type $experiments experiments related to provenance
      * @param type $createdDate Description
      * @param type $metadata
      * @return type
      */
-    public function createProvenance($sessionToken, $label, $comment,$createdDate, $metadata) {
+    public function createProvenance($sessionToken, $label, $comment, $experiments =  array(),$createdDate, $metadata) {
         $subService = "/";
         if(empty($metadata)){
             $metadata = (object) array();
         }
+         
         $provenance = $this->post($sessionToken, $subService, [[
         "label" => $label,
         "comment" => $comment,
         "created" => $createdDate,
+        "experiments" => $experiments,
         "metadata" => $metadata,
         ]]);
 

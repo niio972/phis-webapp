@@ -145,11 +145,11 @@ class ProvenanceController extends Controller {
                 "rdf:type" => "oeso:Operator"
             ];
         }
-        $metadata["experiments"] = $experiments;
         $provenanceUri = $provenanceService->createProvenance(
                 Yii::$app->session['access_token'],
                 $alias,
                 $comment,
+                $experiments,
                 $createdDate,
                 $metadata
         );
