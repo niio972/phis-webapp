@@ -17,7 +17,10 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use app\models\yiiModels\YiiModelsConstants;
 use app\models\yiiModels\YiiExperimentModel;
+use app\models\wsModels\WSProvenanceModel;
 use app\models\wsModels\WSConstants;
+use app\models\yiiModels\DataSearchExperiment;
+
 /**
  * CRUD actions for YiiDataModel
  * 
@@ -26,6 +29,7 @@ use app\models\wsModels\WSConstants;
  * @author Morgane Vidal <morgane.vidal@inra.fr>
  */
 class DataController extends Controller {
+
     /**
      * Define the behaviors
      * 
@@ -41,7 +45,7 @@ class DataController extends Controller {
             ],
         ];
     }
-    
+
     /**
      * search data (by variable, start date, end date). Used in the
      * experiment map visualisation (layer view)
@@ -49,15 +53,15 @@ class DataController extends Controller {
      */
     public function actionSearchFromLayer($id) {
         $searchModel = new \app\models\yiiModels\DataSearchLayers();
-        
+
         $sciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
         $sciencitificObjectSearch->experiment = $id;
         $sciencitificObjectSearch->pageSize = 1;
-       
+
         $sciencitificObjectSearch->setWithProperties(false);
-         
-        
-        
+
+
+
         //1. get Variable uri list
 //        $variableModel = new \app\models\yiiModels\YiiVariableModel($pageSize = 500);
 //        $this->view->params["variables"] = $variableModel->getInstancesDefinitionsUrisAndLabel(Yii::$app->session['access_token']);
@@ -67,22 +71,22 @@ class DataController extends Controller {
         $variables = $experimentModel->getMeasuredVariables(
                 Yii::$app->session[WSConstants::ACCESS_TOKEN],
                 $id
-                );
+        );
         $this->view->params["variables"] = $variables;
         if ($searchModel->load(Yii::$app->request->post())) {
             $scientificObjects = explode(",", Yii::$app->request->post()["agronomicalObjects"]);
-            
+
             $toReturn["variable"] = $searchModel->variable;
-            
+
             //2. For each given scientific object, get data            
             foreach ($scientificObjects as $scientificObject) {
                 $agronomicalObject = [];
                 $searchModel->object = $scientificObject;
-                
+
                 $searchResult = $searchModel->search(Yii::$app->session['access_token'], Yii::$app->request->post());
-                $sciencitificObjectSearch->uri =$scientificObject;
+                $sciencitificObjectSearch->uri = $scientificObject;
                 $sciencitificObjectSearchResults = $sciencitificObjectSearch->search(Yii::$app->session[WSConstants::ACCESS_TOKEN]);
-                
+
                 /* Build array for highChart
                  * e.g : 
                  * {
@@ -99,25 +103,25 @@ class DataController extends Controller {
                 $agronomicalObject["uri"] = $searchModel->object;
                 foreach ($searchResult->getModels() as $model) {
                     $dataToSave = null;
-                    $dataToSave[] = (strtotime($model->date))*1000;
+                    $dataToSave[] = (strtotime($model->date)) * 1000;
                     $dataToSave[] = doubleval($model->value);
-                    $agronomicalObject["data"][]= $dataToSave;
+                    $agronomicalObject["data"][] = $dataToSave;
                 }
-                
+
                 $toReturn["agronomicalObjects"][] = $agronomicalObject;
             }
-            
+
             return $this->renderAjax('_form_data_graph', [
                         'model' => $searchModel,
                         'data' => $toReturn,
-                   ]);
+            ]);
         } else {
             return $this->renderAjax('_form_data_graph', [
                         'model' => $searchModel
-                   ]);
+            ]);
         }
     }
-    
+
     /**
      * Prepare and show the index page of the data. Use the DataSearch class.
      * @see \app\models\yiiModels\DataSearch
@@ -125,20 +129,101 @@ class DataController extends Controller {
      */
     public function actionIndex() {
         $searchModel = new \app\models\yiiModels\DataSearch();
-        
+
         //list of variables
         $variableModel = new \app\models\yiiModels\YiiVariableModel();
         $variables = $variableModel->getInstancesDefinitionsUrisAndLabel(Yii::$app->session['access_token']);
-        
+
         //Get the search params and update pagination
-        $searchParams = Yii::$app->request->queryParams;        
+        $searchParams = Yii::$app->request->queryParams;
         if (isset($searchParams[YiiModelsConstants::PAGE])) {
             $searchParams[YiiModelsConstants::PAGE]--;
         }
-        
+
         if (empty($searchParams["variable"])) {
             $key = $value = NULL;
-            
+
+            //The variable search parameter is required. 
+            //If there is no variable, get the first variable uri.
+            //SILEX:info
+            //It is possible to use array_key_first instead of the following foreach, 
+            //with PHP 7 >= 7.3.0
+            //\SILEX:info
+            foreach ($variables as $key => $value) {
+                $searchModel->variable = $key;
+                break;
+            }
+        }
+
+        $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
+
+        if (is_string($searchResult)) {
+            if ($searchResult === WSConstants::TOKEN) {
+                return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
+            } else {
+                return $this->render('/site/error', [
+                            'name' => Yii::t('app/messages', 'Internal error'),
+                            'message' => $searchResult]);
+            }
+        } else {
+            return $this->render('index', [
+                        'searchModel' => $searchModel,
+                        'dataProvider' => $searchResult,
+                        'variables' => $variables
+            ]);
+        }
+    }
+
+    /**
+     * Prepare and show the index page of the data. Use the DataSearch class.
+     * @see \app\models\yiiModels\DataSearch
+     * @return mixed
+     */
+    public function actionSearch() {
+
+        $searchModel = new DataSearchExperiment();
+        
+        $modelShortName = (new \ReflectionClass(DataSearchExperiment::class))->getShortName();
+        
+        $token = Yii::$app->session[WSConstants::ACCESS_TOKEN];
+
+        // Load existing provenances
+        $provenanceService = new WSProvenanceModel();
+        $provenances = $this->mapProvenancesByUri($provenanceService->getAllProvenances($token));
+        $this->view->params["provenances"] = $provenances;
+
+        //list of experiments
+        $experimentModel = new YiiExperimentModel();
+        $experiments = $experimentModel->getExperimentsURIAndLabelList($token);
+        $this->view->params['experiments'] = $experiments;
+
+
+        //Get the search params and update pagination
+        $searchParams = Yii::$app->request->queryParams;
+        if (isset($searchParams[YiiModelsConstants::PAGE])) {
+            $searchParams[YiiModelsConstants::PAGE]--;
+        }
+
+
+
+
+        $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
+
+        //list of variables 
+        $variables = [];
+
+
+        if ($searchModel->experiment != null) {
+            $experimentModel = new YiiExperimentModel();
+            $variables = $experimentModel->getMeasuredVariables(
+                    Yii::$app->session[WSConstants::ACCESS_TOKEN],
+                    $searchModel->experiment
+            );
+        }
+
+        if (empty($searchParams[$modelShortName]["variable"])) {
+            $key = $value = NULL;
+
             //The variable search parameter is required. 
             //If there is no variable, get the first variable uri.
             //SILEX:info
@@ -151,25 +236,23 @@ class DataController extends Controller {
             }
         }
         
-        $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
-        
         if (is_string($searchResult)) {
             if ($searchResult === WSConstants::TOKEN) {
                 return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
             } else {
                 return $this->render('/site/error', [
-                        'name' => Yii::t('app/messages','Internal error'),
-                        'message' => $searchResult]);
+                            'name' => Yii::t('app/messages', 'Internal error'),
+                            'message' => $searchResult]);
             }
         } else {
-            return $this->render('index', [
-               'searchModel' => $searchModel,
-               'dataProvider' => $searchResult,
-               'variables' => $variables
+            return $this->render('search', [
+                        'searchModel' => $searchModel,
+                        'dataProvider' => $searchResult,
+                        'variables' => $variables
             ]);
         }
     }
-    
+
     /**
      * Download a csv corresponding to the search params of the index view of the data search.
      * @return the csv file.
@@ -183,25 +266,26 @@ class DataController extends Controller {
             $searchModel->object = isset($searchParams["object"]) ? $searchParams["object"] : null;
             $searchModel->provenance = isset($searchParams["provenance"]) ? $searchParams["provenance"] : null;
         }
-        
+
         // Set page size to 400000 for better performances
         $searchModel->pageSize = 400000;
-        
+        $searchVariableModel = new \app\models\yiiModels\VariableSearch();
+        $search = $searchVariableModel->search(Yii::$app->session['access_token'], ['uri' =>  $searchModel->variable]);
         //get all the data (if multiple pages) and write them in a file
         $serverFilePath = \config::path()['documentsUrl'] . "AOFiles/exportedData/" . time() . ".csv";
-        
+
         $headerFile = "variable URI" . Yii::$app->params['csvSeparator'] .
-                      "variable" . Yii::$app->params['csvSeparator'] .
-                      "date" . Yii::$app->params['csvSeparator'] .
-                      "value" . Yii::$app->params['csvSeparator'] .
-                      "object URI" . Yii::$app->params['csvSeparator'] . 
-                      "object" . Yii::$app->params['csvSeparator'] . 
-                      "provenance URI" . Yii::$app->params['csvSeparator'] . 
-                      "provenance" . Yii::$app->params['csvSeparator'] . 
-                      "\n";
+                "variable" . Yii::$app->params['csvSeparator'] .
+                "date" . Yii::$app->params['csvSeparator'] .
+                "value" . Yii::$app->params['csvSeparator'] .
+                "object URI" . Yii::$app->params['csvSeparator'] .
+                "object" . Yii::$app->params['csvSeparator'] .
+                "provenance URI" . Yii::$app->params['csvSeparator'] .
+                "provenance" . Yii::$app->params['csvSeparator'] .
+                "\n";
         file_put_contents($serverFilePath, $headerFile);
 
-        $allLinesStringToWrite = "";        
+        $allLinesStringToWrite = "";
         $totalPage = 1;
         for ($i = 0; $i < $totalPage; $i++) {
             //1. call service for each page
@@ -212,10 +296,10 @@ class DataController extends Controller {
             //2. write in file
             $models = $searchResult->getmodels();
             foreach ($models as $model) {
-                $stringToWrite = $model->variable->uri . Yii::$app->params['csvSeparator'] . 
-                                 $model->variable->label . Yii::$app->params['csvSeparator'] . 
-                                 $model->date . Yii::$app->params['csvSeparator'] .
-                                 $model->value . Yii::$app->params['csvSeparator'];
+                $stringToWrite = $model->variable->uri . Yii::$app->params['csvSeparator'] .
+                        $model->variable->label . Yii::$app->params['csvSeparator'] .
+                        $model->date . Yii::$app->params['csvSeparator'] .
+                        $model->value . Yii::$app->params['csvSeparator'];
                 $stringToWrite .= isset($model->object) ? $model->object->uri . Yii::$app->params['csvSeparator'] : "" . Yii::$app->params['csvSeparator'];
 
                 $objectLabels = "";
@@ -224,18 +308,177 @@ class DataController extends Controller {
                         $objectLabels .= $label . " ";
                     }
                 }
-                
+
                 $stringToWrite .= $objectLabels . Yii::$app->params['csvSeparator'] .
-                                  $model->provenance->uri . Yii::$app->params['csvSeparator'] .
-                                  $model->provenance->label . Yii::$app->params['csvSeparator'] . 
-                                 "\n";
+                        $model->provenance->uri . Yii::$app->params['csvSeparator'] .
+                        $model->provenance->label . Yii::$app->params['csvSeparator'] .
+                        "\n";
                 $allLinesStringToWrite .= $stringToWrite;
-                
             }
-            
+
             $totalPage = intval($searchModel->totalPages);
         }
         file_put_contents($serverFilePath, $allLinesStringToWrite, FILE_APPEND);
-        Yii::$app->response->sendFile($serverFilePath); 
+        Yii::$app->response->sendFile($serverFilePath);
     }
+    
+    /**
+     * Download a csv corresponding to the search params of the index view of the data search.
+     * @return the csv file.
+     */
+    public function actionDownloadExperimentCsv() {
+        $searchModel = new \app\models\yiiModels\DataSearchExperiment();
+        if (isset($_GET['model'])) {
+            $searchParams = $_GET['model'];
+            $searchModel->variable = $searchParams["variable"];
+            $searchModel->experiment = $searchParams["experiment"];
+            $searchModel->date = isset($searchParams["date"]) ? $searchParams["date"] : null;
+            $searchModel->object = isset($searchParams["object"]) ? $searchParams["object"] : null;
+            $searchModel->provenance = isset($searchParams["provenance"]) ? $searchParams["provenance"] : null;
+        }
+
+        // Set page size to 400000 for better performances
+        $searchModel->pageSize = 400000;
+
+        //get all the data (if multiple pages) and write them in a file
+        $serverFilePath = \config::path()['documentsUrl'] . "AOFiles/exportedData/" . time() . ".csv";
+
+        $headerFile = "variable URI" . Yii::$app->params['csvSeparator'] .
+                "variable" . Yii::$app->params['csvSeparator'] .
+                "date" . Yii::$app->params['csvSeparator'] .
+                "value" . Yii::$app->params['csvSeparator'] .
+                
+                "object URI" . Yii::$app->params['csvSeparator'] .
+                "object" . Yii::$app->params['csvSeparator'] .
+                "provenance URI" . Yii::$app->params['csvSeparator'] .
+                "provenance" . Yii::$app->params['csvSeparator'] .
+                "\n";
+        file_put_contents($serverFilePath, $headerFile);
+
+        $allLinesStringToWrite = "";
+        $totalPage = 1;
+        for ($i = 0; $i < $totalPage; $i++) {
+            //1. call service for each page
+            $searchParams["page"] = $i;
+
+            $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
+            var_dump($searchResult);exit;
+            //2. write in file
+            $models = $searchResult->getmodels();
+            foreach ($models as $model) {
+                $stringToWrite = $model->variable->uri . Yii::$app->params['csvSeparator'] .
+                        $model->variable->label . Yii::$app->params['csvSeparator'] .
+                        $model->date . Yii::$app->params['csvSeparator'] .
+                        $model->value . Yii::$app->params['csvSeparator'] .
+                $model->experiment . Yii::$app->params['csvSeparator'];
+                $stringToWrite .= isset($model->object) ? $model->object->uri . Yii::$app->params['csvSeparator'] : "" . Yii::$app->params['csvSeparator'];
+
+                $objectLabels = "";
+                if (isset($model->object)) {
+                    foreach ($model->object->labels as $label) {
+                        $objectLabels .= $label . " ";
+                    }
+                }
+
+                $stringToWrite .= $objectLabels . Yii::$app->params['csvSeparator'] .
+                        $model->provenance->uri . Yii::$app->params['csvSeparator'] .
+                        $model->provenance->label . Yii::$app->params['csvSeparator'] .
+                        "\n";
+                $allLinesStringToWrite .= $stringToWrite;
+            }
+
+            $totalPage = intval($searchModel->totalPages);
+        }
+        file_put_contents($serverFilePath, $allLinesStringToWrite, FILE_APPEND);
+        Yii::$app->response->sendFile($serverFilePath);
+    }
+    
+    /**
+     * Download a csv corresponding to the search params of the index view of the data search.
+     * @return the csv file.
+     */
+    public function actionDownloadExperimentSearchCsv() {
+        $searchModel = new \app\models\yiiModels\DataSearchExperiment();
+        if (isset($_GET['model'])) {
+            $searchParams = $_GET['model'];
+            $searchModel->variable = $searchParams["variable"];
+            $searchModel->experiment = $searchParams["experiment"];
+            $searchModel->date = isset($searchParams["date"]) ? $searchParams["date"] : null;
+            $searchModel->object = isset($searchParams["object"]) ? $searchParams["object"] : null;
+            $searchModel->provenance = isset($searchParams["provenance"]) ? $searchParams["provenance"] : null;
+        }
+
+        // Set page size to 400000 for better performances
+        $searchModel->pageSize = 400000;
+
+        //get all the data (if multiple pages) and write them in a file
+        $serverFilePath = \config::path()['documentsUrl'] . "AOFiles/exportedData/" . time() . ".csv";
+
+        $headerFile = "variable URI" . Yii::$app->params['csvSeparator'] .
+                "variable" . Yii::$app->params['csvSeparator'] .
+                "date" . Yii::$app->params['csvSeparator'] .
+                "value" . Yii::$app->params['csvSeparator'] .
+                "experiment" . Yii::$app->params['csvSeparator'] .
+                "object URI" . Yii::$app->params['csvSeparator'] .
+                "object" . Yii::$app->params['csvSeparator'] .
+                "provenance URI" . Yii::$app->params['csvSeparator'] .
+                "provenance" . Yii::$app->params['csvSeparator'] .
+                "\n";
+        file_put_contents($serverFilePath, $headerFile);
+
+        $allLinesStringToWrite = "";
+        $totalPage = 1;
+        for ($i = 0; $i < $totalPage; $i++) {
+            //1. call service for each page
+            $searchParams["page"] = $i;
+
+            $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
+
+            //2. write in file
+            $models = $searchResult->getmodels();
+            foreach ($models as $model) {
+                $stringToWrite = $model->variable->uri . Yii::$app->params['csvSeparator'] .
+                        $model->variable->label . Yii::$app->params['csvSeparator'] .
+                        $model->date . Yii::$app->params['csvSeparator'] .
+                        $model->value . Yii::$app->params['csvSeparator'] .
+                $model->experiment . Yii::$app->params['csvSeparator'];
+                $stringToWrite .= isset($model->object) ? $model->object->uri . Yii::$app->params['csvSeparator'] : "" . Yii::$app->params['csvSeparator'];
+
+                $objectLabels = "";
+                if (isset($model->object)) {
+                    foreach ($model->object->labels as $label) {
+                        $objectLabels .= $label . " ";
+                    }
+                }
+
+                $stringToWrite .= $objectLabels . Yii::$app->params['csvSeparator'] .
+                        $model->provenance->uri . Yii::$app->params['csvSeparator'] .
+                        $model->provenance->label . Yii::$app->params['csvSeparator'] .
+                        "\n";
+                $allLinesStringToWrite .= $stringToWrite;
+            }
+
+            $totalPage = intval($searchModel->totalPages);
+        }
+        file_put_contents($serverFilePath, $allLinesStringToWrite, FILE_APPEND);
+        Yii::$app->response->sendFile($serverFilePath);
+    }
+
+
+    /**
+     * Create an associative array of the provenances objects indexed by their URI
+     * @param type $provenances
+     * @return array
+     */
+    private function mapProvenancesByUri($provenances) {
+        $provenancesMap = [];
+        if ($provenances !== null) {
+            foreach ($provenances as $provenance) {
+                $provenancesMap[$provenance->uri] = $provenance;
+            }
+        }
+
+        return $provenancesMap;
+    }
+
 }

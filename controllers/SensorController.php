@@ -629,7 +629,7 @@ class SensorController extends Controller {
         $variables = [];
         $variables["data"] = [];
         if(isset($data['sensorUris'])){
-            $sensorVariables = $this->getSensorMeasuredVariablesSelectList($data['sensorUris']);
+            $sensorVariables = $this::getSensorMeasuredVariablesSelectList($data['sensorUris']);
             foreach ($sensorVariables as $key => $value) {
                 $variables["data"][] = ["id" => $key, "text" => $value];
             }
@@ -647,7 +647,7 @@ class SensorController extends Controller {
      *      "http://www.opensilex.org/demo/variables/id/v002" => "labelv2",
      * ]
      */
-    public function getSensorMeasuredVariablesSelectList($sensorUris) {
+    public static function getSensorMeasuredVariablesSelectList($sensorUris) {
         $variables = [];
         if(!isset($sensorUris) || empty($sensorUris)){
             return $variables;

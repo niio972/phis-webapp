@@ -484,9 +484,8 @@ class DatasetController extends Controller {
             $fileContent = str_getcsv(file_get_contents($serverFilePath), "\n");
             $csvHeaders = str_getcsv(array_shift($fileContent), Yii::$app->params['csvSeparator']);
             unlink($serverFilePath);
-
-            $sensorController = new SensorController();
-            $sensorVariables = $sensorController->getSensorMeasuredVariablesSelectList($datasetModel->provenanceSensingDevices) ;
+ 
+            $sensorVariables = SensorController::getSensorMeasuredVariablesSelectList($datasetModel->provenanceSensingDevices) ;
             $csvVariables = array_slice($csvHeaders, 1);
             // select all variables that don"t exist in experiment variables
             $variablesNotInSensor = array_diff($csvVariables, array_values($sensorVariables)); 

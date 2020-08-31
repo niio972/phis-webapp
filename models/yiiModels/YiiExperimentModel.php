@@ -465,7 +465,6 @@ class YiiExperimentModel extends WSActiveRecord {
                 return $this->variables;
             }
         }
-        
         return $variables;
     }
 }

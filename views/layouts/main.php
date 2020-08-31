@@ -136,7 +136,11 @@ ToastrAsset::register($this);
                                 [
                                     'label' => Icon::show('search', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'View'),
                                     'url' => ['/data/index']
-                                ]
+                                ],
+//                                [
+//                                    'label' => Icon::show('search', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Search by experiment'),
+//                                    'url' => ['/data/search']
+//                                ],
                             ]
                         ];
         $menuItems[] = ['label' => Yii::t('app', 'Device'),
@@ -278,6 +282,11 @@ ToastrAsset::register($this);
                                     'label' => Icon::show('search', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'View'),
                                     'url' => ['/data/index']
                                 ],
+                                
+//                                [
+//                                    'label' => Icon::show('search', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Search by experiment'),
+//                                    'url' => ['/data/search']
+//                                ],
                                 [
                                     'label' => Icon::show('plus', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', 'Add on scientific object'),
                                     'url' => ['/dataset/create']

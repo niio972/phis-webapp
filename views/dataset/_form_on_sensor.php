@@ -117,6 +117,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                 provenance['label']= $("#provenance-selector :selected").val();
                 provenance['comment']= $("#yiidatasensormodel-provenancecomment").val();
                 provenance['documents']= [];
+                provenance['experiments']= [];
                 if($("#yiidatasensormodel-documentsuris").val() !== undefined){
                     provenance['documents']= $("#yiidatasensormodel-documentsuris").val();
                 }
@@ -424,7 +425,6 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
             ],
             'pluginOptions' => [
                 'allowClear' => false,
-                'tags' => true,
                 'maximumSelectionLength' =>'1'
             ],
                 'pluginEvents' => [
@@ -451,8 +451,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                 'data' => [],
                 'options' => $select2VariablesOptions,
                 'pluginOptions' => [
-                    'allowClear' => true,
-                    'tags' => false
+                    'allowClear' => true
                 ],
             ]);
         ?>

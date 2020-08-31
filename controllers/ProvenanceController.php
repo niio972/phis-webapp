@@ -54,6 +54,7 @@ class ProvenanceController extends Controller {
         if(isset($data["documents"])){
             $documents = $data["documents"];
         }
+        
         $provenanceUri = $this->createProvenance(
                             $provenance['label'],
                             $provenance['comment'],
@@ -61,7 +62,6 @@ class ProvenanceController extends Controller {
                             $provenance['agents'],
                             $provenance['experiments']
                     );
-        
         $this->linkDocumentsToProvenance($provenanceUri, $documents);
         
         if($provenanceUri != false){
@@ -145,6 +145,11 @@ class ProvenanceController extends Controller {
                 "rdf:type" => "oeso:Operator"
             ];
         }
+        
+        if(!isset($experiments) || $experiments == null ){
+            $experiments= [];
+        }
+        
         $provenanceUri = $provenanceService->createProvenance(
                 Yii::$app->session['access_token'],
                 $alias,
@@ -153,6 +158,7 @@ class ProvenanceController extends Controller {
                 $createdDate,
                 $metadata
         );
+                   
 
         if (is_string($provenanceUri) && $provenanceUri != "token") {
             return $provenanceUri;

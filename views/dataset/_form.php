@@ -409,8 +409,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
             'multiple' => false
         ],
         'pluginOptions' => [
-            'allowClear' => true,
-            'tags' => true
+            'allowClear' => true
         ],  
         'pluginEvents' => [
             'select2:select' => 'function(e) { populateVariableList(e.params.data.id); }',
@@ -437,8 +436,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                 'data' => [],
                 'options' => $select2VariablesOptions,
                 'pluginOptions' => [
-                    'allowClear' => true,
-                    'tags' => false
+                    'allowClear' => true
                 ],
             ]);
         ?>
