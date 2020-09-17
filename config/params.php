@@ -140,7 +140,8 @@ return [
     'to' => 'http://www.opensilex.org/vocabulary/oeev#to',
     'associatedToASensor' => 'http://www.opensilex.org/vocabulary/oeev#associatedToASensor',
     'position' => 'http://www.opensilex.org/vocabulary/oeev#hasDevicePosition',
-
+    'creator' =>'http://purl.org/dc/terms/creator',
+    
     // Image filters
     'image.filter' => [
         'metadata.position' => [

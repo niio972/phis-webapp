@@ -90,14 +90,14 @@ class DataSearchExperiment extends YiiDataModel {
         $params = [
           WSConstants::PAGE => $this->page,
           WSConstants::PAGE_SIZE => $this->pageSize,
-          "variable" => $this->variable,
+          "variableUri" => $this->variable,
           "startDate" => $this->startDate,
           "endDate" => $this->endDate,
           "objectLabel" => $this->object,
           "provenanceLabel" => $this->provenance,
           "dateSortAsc" => null
         ];
-        
+
         $requestRes = $this->wsModel->getDataByExperiment($sessionToken, $this->experiment, $params);
         
         if (isset($requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION})) {
@@ -138,7 +138,6 @@ class DataSearchExperiment extends YiiDataModel {
         if (!$this->validate()) {
             return new \yii\data\ArrayDataProvider();
         }
-        
         //3. Request to the web service and return result
         $findResult = $this->searchData($sessionToken);
         

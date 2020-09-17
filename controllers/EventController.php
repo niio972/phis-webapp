@@ -123,7 +123,10 @@ class EventController extends GenericController {
     private function hasUnupdatableProperties($eventAction) : bool {
         foreach($eventAction->properties as $property) {
             if($property->relation !== Yii::$app->params['from']
-                    && $property->relation !== Yii::$app->params['to']) {
+                    && $property->relation !== Yii::$app->params['to']
+                    && $property->relation !== Yii::$app->params['creator']
+                    && $property->relation !== Yii::$app->params['position']
+                    && $property->relation !== Yii::$app->params['associatedToASensor']) {
                 return true;
             }
         }
