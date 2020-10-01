@@ -367,7 +367,7 @@ class DatasetController extends Controller {
                     $provenanceUri = $datasetModel->provenanceUri;
                     $sciencitificObjectSearch = new \app\models\yiiModels\ScientificObjectSearch();
                     $sciencitificObjectSearch->experiment = $datasetModel->experiment;
-                    $sciencitificObjectSearch->pageSize = 30000;
+                    $sciencitificObjectSearch->pageSize = 40000;
                     $sciencitificObjectSearch->setWithProperties(false);
                     $sciencitificObjectSearchResults = $sciencitificObjectSearch->search($token);
 
