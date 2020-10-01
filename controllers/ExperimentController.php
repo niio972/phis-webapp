@@ -428,7 +428,7 @@ class ExperimentController extends Controller {
      * @param string $experimentUri
      * @return array
      */
-    public function getExperimentMesuredVariablesSelectList($experimentUri) {
+    public static function getExperimentMesuredVariablesSelectList($experimentUri) {
         if(!isset($experimentUri) || empty($experimentUri)){
             return [];
         }

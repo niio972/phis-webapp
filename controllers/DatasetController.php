@@ -355,9 +355,8 @@ class DatasetController extends Controller {
             $csvHeaders = str_getcsv(array_shift($fileContent), Yii::$app->params['csvSeparator']);
             unlink($serverFilePath);
 
-            //Loaded given variables
-            $experimentController = new ExperimentController();
-            $experimentVariables = $experimentController->getExperimentMesuredVariablesSelectList($datasetModel->experiment) ;
+            //Loaded given variables 
+            $experimentVariables = ExperimentController::getExperimentMesuredVariablesSelectList($datasetModel->experiment) ;
             $csvRawVariables = array_slice($csvHeaders, 2);
             // clean variables name
             $csvVariables = array_map('trim', $csvRawVariables);
