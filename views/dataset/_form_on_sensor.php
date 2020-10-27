@@ -50,7 +50,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                     url: '<?= Url::toRoute(['sensor/ajax-get-sensor-measured-variables-select-list']); ?>',
                     type: 'POST',
                     dataType: 'json',
-                    data: {"sensorUris": sensorUris}
+                    data: {"sensorUris": [sensorUris]}
                 })
                 .done(function (data) {
                     select.html("");
@@ -123,7 +123,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                 }
                 provenance['sensingDevices']= [];
                 if($("#yiidatasensormodel-provenancesensingdevices").val() !== undefined){
-                    provenance['sensingDevices']= $("#yiidatasensormodel-provenancesensingdevices").val();
+                    provenance['sensingDevices']= [$("#yiidatasensormodel-provenancesensingdevices").val()];
                 }
                 provenance['agents']= [];
                 if($("#yiidatasensormodel-provenanceagents").val() !== undefined){
@@ -187,7 +187,7 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
                     url: "<?= Url::toRoute(['provenance/ajax-get-specific-sensor-provenances-select-list']); ?>",
                     type: 'POST',
                     datatype: 'json',
-                    data: {"sensorUris": sensorUris}
+                    data: {"sensorUris": [sensorUris]}
             }) .done(function (data) {
                 console.log(data)
                 var select = $('#provenance-selector');
@@ -421,11 +421,10 @@ $this->registerCssFile("https://rawgit.com/lykmapipo/themify-icons/master/css/th
             'id' => 'sensor-selector',
             'options' => [
                 'placeholder' => Yii::t('app/messages', 'Select existing device') . ' ...',
-                'multiple' => true
+                'multiple' => false
             ],
             'pluginOptions' => [
-                'allowClear' => false,
-                'maximumSelectionLength' =>'1'
+                'allowClear' => true, 
             ],
                 'pluginEvents' => [
                 'select2:select' => 'function(e) { populateVariableListFromSensorUris(e.params.data.id); }',

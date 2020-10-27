@@ -654,6 +654,7 @@ class SensorController extends Controller {
         }
         $sensorModel = new YiiSensorModel();
         foreach ($sensorUris as $uri) {
+
             $variablesTmp = $sensorModel->getMeasuredVariables(
                 Yii::$app->session[WSConstants::ACCESS_TOKEN],
                 $uri
