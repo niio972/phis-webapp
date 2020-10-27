@@ -362,7 +362,7 @@ class DataController extends Controller {
             $searchParams["page"] = $i;
 
             $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
-            var_dump($searchResult);exit;
+           
             //2. write in file
             $models = $searchResult->getmodels();
             foreach ($models as $model) {
