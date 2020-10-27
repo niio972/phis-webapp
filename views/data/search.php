@@ -151,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo $form->field($searchModel, 'provenance')->widget(\kartik\select2\Select2::classname(), [
             'data' => $provenancesArray,
             'options' => [
-                'placeholder' => Yii::t('app/messages', 'Select existing provenance or create a new one') . ' ...',
+                'placeholder' => Yii::t('app/messages', 'Select existing provenance') . ' ...',
                 'id' => 'provenance-selector',
                 'multiple' => false
             ],

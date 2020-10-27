@@ -336,6 +336,12 @@ class DataController extends Controller {
             $searchModel->object = isset($searchParams["object"]) ? $searchParams["object"] : null;
             $searchModel->provenance = isset($searchParams["provenance"]) ? $searchParams["provenance"] : null;
         }
+        
+        $token = Yii::$app->session[WSConstants::ACCESS_TOKEN];
+
+        $experimentModel = new YiiExperimentModel();
+        $experiments = $experimentModel->getExperimentsURIAndLabelList($token);
+       
 
         // Set page size to 400000 for better performances
         $searchModel->pageSize = 400000;
@@ -347,7 +353,8 @@ class DataController extends Controller {
                 "variable" . Yii::$app->params['csvSeparator'] .
                 "date" . Yii::$app->params['csvSeparator'] .
                 "value" . Yii::$app->params['csvSeparator'] .
-                
+                "experiment URI" . Yii::$app->params['csvSeparator'] .
+                "experiment" . Yii::$app->params['csvSeparator'] .
                 "object URI" . Yii::$app->params['csvSeparator'] .
                 "object" . Yii::$app->params['csvSeparator'] .
                 "provenance URI" . Yii::$app->params['csvSeparator'] .
@@ -370,7 +377,8 @@ class DataController extends Controller {
                         $model->variable->label . Yii::$app->params['csvSeparator'] .
                         $model->date . Yii::$app->params['csvSeparator'] .
                         $model->value . Yii::$app->params['csvSeparator'] .
-                $model->experiment . Yii::$app->params['csvSeparator'];
+               $searchModel->experiment . Yii::$app->params['csvSeparator'].
+               $experiments[$searchModel->experiment] . Yii::$app->params['csvSeparator'];
                 $stringToWrite .= isset($model->object) ? $model->object->uri . Yii::$app->params['csvSeparator'] : "" . Yii::$app->params['csvSeparator'];
 
                 $objectLabels = "";
