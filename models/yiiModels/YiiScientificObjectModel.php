@@ -90,7 +90,7 @@ class YiiScientificObjectModel extends WSActiveRecord {
     const REPLICATION = "replication";
     
     public $parent;
-    const ISPARTOF = "ispartof";
+    const ISPARTOF = "isPartOf";
 
     /**
      * Initialize wsModel. In this class, wsModel is a WSScientificObjectModel

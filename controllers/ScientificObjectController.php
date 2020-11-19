@@ -529,10 +529,11 @@ class ScientificObjectController extends Controller {
         $p["experiment"] = $scientificObject["experiment"];
         $p["geometry"] = $scientificObject["geometry"];
 
-        if ($scientificObject["ispartof"] != null) {
-            $parent["relation"] = Yii::$app->params['isPartOf'];
-            $parent["value"] = $scientificObject["ispartof"];
-            $p["properties"][] = $parent;
+        if ($scientificObject["isPartOf"] != null) {
+            $p["isPartOf"] = $scientificObject["isPartOf"];
+            // $parent["relation"] = Yii::$app->params['isPartOf'];
+            // $parent["value"] = $scientificObject["ispartof"];
+            // $p["properties"][] = $parent;
         }
 
         if ($scientificObject["species"] != null) {
@@ -770,13 +771,15 @@ class ScientificObjectController extends Controller {
      */
     public function actionDownloadCsv() {
         $searchModel = new ScientificObjectSearch();
+        $searchParams = []; // ???
+
         if (isset($_GET['model'])) {
             $searchParams = $_GET['model'];
+            $searchParams['alias'] = $searchParams['label'];
             $searchModel->label = isset($searchParams["alias"]) ? $searchParams["alias"] : null;  //why alias ? and not label , c'est quoi l'alias ?
             $searchModel->type = isset($searchParams["type"]) ? $searchParams["type"] : null;
             $searchModel->experiment = isset($searchParams["experiment"]) ? $searchParams["experiment"] : null;
         }
-        $searchParams = []; // ???
         // Set page size to 10000 for better performances
         $searchModel->pageSize = 10000;
 
