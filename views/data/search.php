@@ -102,6 +102,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'pluginEvents' => [
                 'select2:select' => 'function(e) { populateVariableList(e.params.data.id); }',
+            ],
+            'pluginOptions' => [
+                'allowClear' => true,
+                'tags' => false
             ]
         ]);
 
@@ -113,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'pluginOptions' => [
                 'allowClear' => true,
-                'tags' => true
+                'tags' => false
             ],
         ]);
         ?> 

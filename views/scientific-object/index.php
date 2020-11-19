@@ -99,7 +99,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         'placeholder' => 'Select object type...'
                     ],
                     'pluginOptions' => [
-                        'allowClear' => true
+                        'allowClear' => true,
+                        'tags' => false
                     ],
                 ]),
             ],
@@ -133,6 +134,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'data' => $this->params['listExperiments'],
                     'options' => [
                         'placeholder' => 'Select experiment alias...'
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'tags' => false
                     ]
                 ]),
             ],
