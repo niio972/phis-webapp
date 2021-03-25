@@ -884,7 +884,7 @@ class ScientificObjectController extends Controller {
                 $scientificObjectModel->type = $this->getObjectTypeCompleteUri($object[2]);
                 $experiment = array_search($object[3], $experiments);
                 $scientificObjectModel->geometry = $object[4];
-                $scientificObjectModel->parent = $object[5];
+                $scientificObjectModel->parent = empty($object[5]) ? null : $object[5];
                 $scientificObjectModel->species = array_search($object[6], $species);
                 $scientificObjectModel->variety = $object[7];
                 $scientificObjectModel->modality = $object[8];
